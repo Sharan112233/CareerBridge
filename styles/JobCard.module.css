@@ -1,0 +1,25 @@
+.card { display: block; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 12px; padding: 18px; transition: all 0.2s; position: relative; }
+.card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--card-shadow-lg); }
+
+.top { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+.logo { width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.logoText { color: #fff; font-weight: 700; font-size: 16px; letter-spacing: 0.5px; }
+.meta { flex: 1; min-width: 0; }
+.company { font-size: 12px; font-weight: 600; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 2px; }
+.title { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.3; }
+.newBadge { background: var(--success); color: #fff; font-size: 10px; font-weight: 700; padding: 3px 7px; border-radius: 10px; letter-spacing: 0.3px; }
+
+.info { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; font-size: 12px; color: var(--text-soft); }
+.infoItem { display: inline-flex; align-items: center; gap: 4px; }
+
+.salary { font-size: 14px; font-weight: 700; color: var(--success); margin-bottom: 10px; }
+
+.tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
+.tag { font-size: 10px; font-weight: 600; color: var(--accent); background: var(--accent-soft); padding: 3px 8px; border-radius: 12px; }
+
+.footer { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid var(--border); }
+.posted { font-size: 11px; color: var(--text-faint); }
+.viewBtn { font-size: 12px; font-weight: 600; color: var(--accent); }
+
+.expired { opacity: 0.6; }
+.expiredBadge { background: var(--danger); color: #fff; font-size: 10px; font-weight: 700; padding: 3px 7px; border-radius: 10px; letter-spacing: 0.3px; }

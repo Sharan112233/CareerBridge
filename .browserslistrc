@@ -1,0 +1,8 @@
+# Target modern browsers only.
+# This drops ~10 KiB of legacy polyfills (array.at, Object.hasOwn, etc.)
+# Lighthouse flags these under "Legacy JavaScript".
+>0.5%
+last 2 versions
+not dead
+not IE 11
+not op_mini all

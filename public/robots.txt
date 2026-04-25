@@ -1,0 +1,14 @@
+# *
+User-agent: *
+Allow: /
+
+# *
+User-agent: *
+Disallow: /admin
+Disallow: /api/
+
+# Host
+Host: https://careerbridge.com
+
+# Sitemaps
+Sitemap: https://careerbridge.com/sitemap.xml
