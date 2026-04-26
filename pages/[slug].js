@@ -248,7 +248,20 @@ export default function JobDetail({ job, relatedJobs, cleanDescription, jobLd, b
           {job.eligibility && (
             <div className={styles.card}>
               <h2 className={styles.cardTitle}>Eligibility Criteria</h2>
-              <div className={styles.eligibility}>{job.eligibility}</div>
+              {/* Match Responsibilities/Skills style: a bulleted list using
+                  the same .list class for consistent sizing.
+                  Eligibility is stored as sentences ("X. Y. Z.") — we split
+                  on period+space to get one bullet per criterion.
+                  If the text has no periods (single criterion), splitItems
+                  returns a single-element array, so it still renders cleanly. */}
+              <ul className={styles.list}>
+                {splitItems(job.eligibility).map((item, i) => (
+                  <li key={i}>
+                    <span className={styles.bullet}>•</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
 
@@ -437,7 +450,16 @@ function buildJobPostingLd(job) {
     directApply: false,
     url: `${SITE_URL}/${job.slug}`,
   };
-  if (job.valid_through) ld.validThrough = new Date(job.valid_through).toISOString();
+  if (job.valid_through) {
+    // Defensive: an invalid string slipped in via CSV import (e.g. "null"
+    // as a literal, or a malformed date) would throw inside toISOString().
+    // Guard against that — bad date just means we omit validThrough rather
+    // than 500 the entire page.
+    const vt = new Date(job.valid_through);
+    if (!Number.isNaN(vt.getTime())) {
+      ld.validThrough = vt.toISOString();
+    }
+  }
   const min = Number(job.salary_min), max = Number(job.salary_max);
   if (Number.isFinite(min) && Number.isFinite(max) && min > 0) {
     ld.baseSalary = {
@@ -477,6 +499,41 @@ function buildFaqLd(job, faqs) {
 
 function escapeHtml(s) {
   return String(s).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+}
+
+// Splits a free-text "sentences with periods" field into bullet items.
+// Robust to:
+//   - Multiple periods inside a sentence (degrees like "B.E", "B.Tech", "M.Sc")
+//     by only splitting where a period is followed by whitespace + a capital
+//     letter or end-of-string (not after abbreviations like "B.E", "B.Sc")
+//   - Trailing whitespace and empty trailing fragments
+//   - Pipe-separated input (legacy CSV mistake) — we accept those too
+//
+// Examples:
+//   "Must be graduate. Strong English skills. Comfortable with shifts."
+//     → ["Must be graduate", "Strong English skills", "Comfortable with shifts"]
+//   "B.E/B.Tech 2024 passout. 60% throughout. No backlogs."
+//     → ["B.E/B.Tech 2024 passout", "60% throughout", "No backlogs"]
+//   "Single line with no periods"
+//     → ["Single line with no periods"]
+function splitItems(text) {
+  if (!text) return [];
+  const raw = String(text).trim();
+  if (!raw) return [];
+
+  // Legacy / accidental pipe-separated input — split on pipes first
+  if (raw.includes('|')) {
+    return raw.split('|').map((s) => s.trim()).filter(Boolean);
+  }
+
+  // Split on ". " ONLY when followed by a capital letter (or digit) — protects
+  // abbreviations like "B.E", "M.Sc", "Ph.D", "10+2+3" from being broken apart.
+  const parts = raw
+    .split(/\.\s+(?=[A-Z0-9])/)
+    .map((s) => s.replace(/\.+\s*$/, '').trim())
+    .filter(Boolean);
+
+  return parts.length > 0 ? parts : [raw];
 }
 
 export async function getStaticPaths() {
