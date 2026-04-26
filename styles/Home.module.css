@@ -11,7 +11,7 @@
 
 .adWrap { max-width: 1200px; margin: 24px auto 0; padding: 0 20px; }
 .main { max-width: 1200px; margin: 32px auto; padding: 0 20px; }
-.sectionTop { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; scroll-margin-top: 16px; }
+.sectionTop { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 8px; margin-bottom: 20px; scroll-margin-top: 16px; }
 .sectionTitle { font-size: 22px; font-weight: 700; color: var(--text); }
 .filters { display: flex; gap: 6px; flex-wrap: wrap; }
 .filterBtn { padding: 6px 14px; border: 1.5px solid var(--border); border-radius: 20px; font-size: 13px; font-weight: 500; background: var(--bg-elevated); color: var(--text-muted); transition: all 0.15s; }

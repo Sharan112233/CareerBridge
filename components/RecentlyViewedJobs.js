@@ -110,6 +110,7 @@ export default function RecentlyViewedJobs({ excludeId, excludeSlug }) {
 const styles = {
   section: {
     marginTop: 40,
+    marginBottom: 32,
     background: 'var(--bg-elevated)',
     border: '1px solid var(--border)',
     borderRadius: 12,

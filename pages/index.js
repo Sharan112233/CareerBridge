@@ -31,7 +31,7 @@ const RecentlyViewedJobs = dynamic(
 const PAGE_SIZE = 9;
 const FETCH_TIMEOUT_MS = 15000; // surface a failure after 15s instead of spinning forever
 
-export default function Home({ initialJobs, totalJobs }) {
+export default function Home({ initialJobs, totalJobs, companyCount }) {
   const router = useRouter();
 
   const [filter, setFilter] = React.useState('All');
@@ -213,7 +213,6 @@ export default function Home({ initialJobs, totalJobs }) {
 
       <section className={styles.hero}>
         <div className={styles.heroInner}>
-          <span className={styles.heroTag}>🔥 Updated Daily</span>
           <h1 className={styles.heroTitle}>
             Find Your Dream Job<br />
             <span className={styles.heroAccent}>from Top Companies</span>
@@ -223,7 +222,11 @@ export default function Home({ initialJobs, totalJobs }) {
             One click → Official Company Application Page.
           </p>
           <div className={styles.heroStats}>
-            {[['150+','Active Jobs'],['50+','Companies'],['10K+','Monthly Visitors'],['Daily','Updates']].map(([n,l]) => (
+            {[
+              [String(totalJobs ?? 0)+"+", 'Active Jobs '],
+              [String(companyCount ?? 0)+"+",'Companies'],
+              ['Daily', 'Updates'],
+            ].map(([n, l]) => (
               <div key={l} className={styles.stat}>
                 <span className={styles.statNum}>{n}</span>
                 <span className={styles.statLabel}>{l}</span>
@@ -349,17 +352,31 @@ export default function Home({ initialJobs, totalJobs }) {
 
 export async function getStaticProps() {
   try {
-    const { jobs, total } = await getJobsPaginated(1, PAGE_SIZE);
+    // We need three things from the DB at build time:
+    //   1. Page 1 jobs (for the listing)
+    //   2. Total active job count (for pagination + hero stat)
+    //   3. Distinct company count (for hero stat)
+    //
+    // Importing getAllCompanies inside the function keeps the bundle tree-shake
+    // clean — getAllCompanies is only used here on the server.
+    const { getAllCompanies } = await import('../lib/supabase');
+
+    const [{ jobs, total }, companies] = await Promise.all([
+      getJobsPaginated(1, PAGE_SIZE),
+      getAllCompanies(),
+    ]);
+
     return {
       props: {
         initialJobs: jobs,
         totalJobs: total,
+        companyCount: Array.isArray(companies) ? companies.length : 0,
       },
       revalidate: 60,
     };
   } catch (err) {
     return {
-      props: { initialJobs: [], totalJobs: 0 },
+      props: { initialJobs: [], totalJobs: 0, companyCount: 0 },
       revalidate: 30,
     };
   }
