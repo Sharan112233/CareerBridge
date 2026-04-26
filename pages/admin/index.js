@@ -208,11 +208,24 @@ export default function AdminPage() {
       });
       const d = await r.json();
       if (!r.ok) throw new Error(d.error || 'Import failed');
-      const rowErr = (d.rowErrors || []).length;
-      pushToast(
-        'success',
-        `Inserted ${d.inserted} jobs.${rowErr ? ` ${rowErr} rows skipped.` : ''}`,
-      );
+
+      const errCount = (d.rowErrors || []).length;
+      const warnCount = (d.rowWarnings || []).length;
+
+      // Build a summary message. Shows key counts and tells admin to open
+      // browser console for full per-row details.
+      let msg = `Inserted ${d.inserted} jobs.`;
+      if (errCount) msg += ` ${errCount} row${errCount === 1 ? '' : 's'} skipped.`;
+      if (warnCount) msg += ` ${warnCount} normalized.`;
+      if (errCount || warnCount) msg += ' See console for details.';
+
+      pushToast('success', msg);
+
+      // Per-row details go to the browser console — the toast itself stays
+      // short, but admin can open DevTools to see exactly what was changed.
+      if (errCount) console.warn('Bulk import — row errors:', d.rowErrors);
+      if (warnCount) console.info('Bulk import — row warnings (auto-normalized):', d.rowWarnings);
+
       setCsv('');
       setTab('list');
       load();
@@ -450,14 +463,45 @@ export default function AdminPage() {
       {tab === 'bulk' && (
         <div className={styles.formWrap}>
           <h2 className={styles.formTitle}>📥 Bulk CSV Import</h2>
-          <p style={{ color: 'var(--text-soft)', fontSize: 13, marginBottom: 12 }}>
-            Paste CSV with a header row. Required columns: <code>title, company, apply_url</code>.
-            Optional: <code>slug, location, job_type, experience, salary, salary_min, salary_max, salary_currency,
-            description, eligibility, responsibilities, skills, tags, last_date, valid_through, category, logo_color,
-            is_fresher</code>.
-            Use <code>|</code> (pipe) to separate items inside <code>responsibilities</code> and <code>skills</code>.
-            Duplicate slugs will be updated, not duplicated.
-          </p>
+          <details style={{ marginBottom: 14, fontSize: 13, color: 'var(--text-soft)' }}>
+            <summary style={{ cursor: 'pointer', fontWeight: 600, color: 'var(--text)', marginBottom: 8 }}>
+              📖 CSV format reference — click to expand
+            </summary>
+            <div style={{ marginTop: 10, lineHeight: 1.6 }}>
+              <p style={{ marginBottom: 8 }}>
+                <strong>Required columns:</strong> <code>title, company, apply_url</code>
+              </p>
+              <p style={{ marginBottom: 8 }}>
+                <strong>All supported columns</strong> (in any order — only header names matter):
+              </p>
+              <ul style={{ marginLeft: 20, marginBottom: 12, fontSize: 12 }}>
+                <li><code>title</code>, <code>company</code>, <code>apply_url</code> — required</li>
+                <li><code>slug</code> — auto-generated from title+company if blank</li>
+                <li><code>location</code>, <code>job_type</code>, <code>experience</code></li>
+                <li><code>salary</code> — display text e.g. <code>₹2.5 – 3.5 LPA</code> (auto-built from salary_min/max if blank)</li>
+                <li><code>salary_min</code>, <code>salary_max</code> — numeric yearly amounts (for Google Jobs)</li>
+                <li><code>salary_currency</code> — defaults to <code>INR</code></li>
+                <li><code>last_date</code> — display text e.g. <code>June 30, 2026</code></li>
+                <li><code>valid_through</code> — date for Google Jobs schema, e.g. <code>2026-06-30</code></li>
+                <li><code>category</code> — <code>IT</code>, <code>BPO</code>, <code>BFSI</code>, or <code>CORE</code></li>
+                <li><code>description</code>, <code>eligibility</code>, <code>seo_title</code></li>
+                <li><code>responsibilities</code> — <strong>pipe-separated</strong>: <code>Item 1|Item 2|Item 3</code></li>
+                <li><code>skills</code> — <strong>pipe-separated</strong>: <code>Java|Python|SQL</code></li>
+                <li><code>tags</code> — comma-separated INSIDE quotes: <code>&quot;Java, Fresher, BPO&quot;</code></li>
+                <li><code>logo_color</code> — hex color, e.g. <code>#2563EB</code></li>
+                <li><code>is_fresher</code> — <code>true</code> or <code>false</code></li>
+              </ul>
+              <p style={{ marginBottom: 8 }}>
+                <strong>Auto-normalization:</strong> <code>category</code> and <code>job_type</code> accept aliases
+                — e.g. <code>BPO Jobs</code> → <code>BPO</code>, <code>Full-time</code> → <code>Full Time</code>.
+              </p>
+              <p style={{ marginBottom: 0 }}>
+                <strong>Tips:</strong> Wrap any cell containing commas in <code>&quot;double quotes&quot;</code>.
+                Existing rows with the same <code>slug</code> are updated (not duplicated).
+                After import, open browser DevTools console to see per-row warnings about what was normalized.
+              </p>
+            </div>
+          </details>
           <textarea
             className={styles.textarea}
             value={csv}

@@ -14,7 +14,6 @@ import JobCard from '../components/JobCard';
 import Footer from '../components/Footer';
 import ShareButtons from '../components/ShareButtons';
 import RecentlyViewedJobs, { pushRecentlyViewed } from '../components/RecentlyViewedJobs';
-import CompanyLogo from '../components/CompanyLogo';
 import styles from '../styles/JobDetail.module.css';
 
 
@@ -95,7 +94,29 @@ export default function JobDetail({ job, relatedJobs, cleanDescription, jobLd, b
     }, 500);
   };
 
-  const postedDate = new Date(job.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+  // Format both dates the same way for consistency: "26 Apr 2026"
+  // (short month, Indian D-M-Y order — matches the audience).
+  const formatShortDate = (input) => {
+    if (!input) return null;
+    const d = new Date(input);
+    if (Number.isNaN(d.getTime())) return null;
+    return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  };
+
+  // "Listed on" — always present (created_at is always set on a real job)
+  const listedOn = formatShortDate(job.created_at);
+
+  // "Last date to apply" — prefer the strict ISO valid_through (Google Jobs
+  // schema field), fall back to admin's free-text last_date, fall back to
+  // "Not specified" so the row stays balanced with the Listed-on row.
+  let lastDateDisplay;
+  if (job.valid_through) {
+    lastDateDisplay = formatShortDate(job.valid_through) || job.last_date || 'Not specified';
+  } else if (job.last_date) {
+    lastDateDisplay = job.last_date;
+  } else {
+    lastDateDisplay = 'Not specified';
+  }
   const jobUrl = `${SITE_URL}/${job.slug}`;
   const companySlug = (job.company || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
   const categorySlug = categoryToSlug(job.category);
@@ -152,12 +173,9 @@ export default function JobDetail({ job, relatedJobs, cleanDescription, jobLd, b
 
           <div className={styles.headerCard}>
             <div className={styles.headerTop}>
-              <CompanyLogo
-                company={job.company}
-                size={60}
-                borderRadius={12}
-                fallbackColor={job.logo_color}
-              />
+              <div className={styles.companyLogo} style={{ background: job.logo_color || '#2563EB' }}>
+                {(job.company || 'CO').slice(0, 2).toUpperCase()}
+              </div>
               <div className={styles.headerMeta}>
                 <div className={styles.companyName}>{job.company}</div>
                 <h2 className={styles.jobTitle}>{job.title}</h2>
@@ -177,9 +195,9 @@ export default function JobDetail({ job, relatedJobs, cleanDescription, jobLd, b
 
             <div className={styles.applySection}>
               <div className={styles.applyMeta}>
-                <span>📅 Last Date: <strong>{job.last_date}</strong></span>
+                <span>📅 Last date to apply: <strong>{lastDateDisplay}</strong></span>
                 {/* View count hidden from public — visible to admins in the dashboard only. */}
-                <span>📆 Posted: {postedDate}</span>
+                <span>📆 Listed on: {listedOn}</span>
               </div>
               <div className={styles.applyBtns}>
                 <button
@@ -331,7 +349,7 @@ export default function JobDetail({ job, relatedJobs, cleanDescription, jobLd, b
               ['Experience', job.experience],
               ['Salary', job.salary],
               ['Job Type', job.job_type],
-              ['Last Date', job.last_date],
+              ['Last date to apply', lastDateDisplay],
             ].map(([k, v]) => (
               <div key={k} className={styles.sideRow}>
                 <span className={styles.sideKey}>{k}</span>
