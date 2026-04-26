@@ -157,16 +157,19 @@ export default function AdminPage() {
   };
 
   // Delete flow:
-  //   1. Click Delete → ConfirmModal opens (never window.confirm)
-  //   2. User confirms → API call → Toast shows the outcome
+  //   1. Click Delete → themed ConfirmModal opens
+  //   2. User confirms → API hard-deletes the job from the database
+  //   3. Toast shows the outcome, table refreshes
+  //
+  // ⚠️ Hard delete — there is no undo. The row is permanently removed.
   const handleDelete = (job) => {
     setConfirmState({
       title: 'Delete this job?',
       message: (
         <>
           <strong>{job.title}</strong> at <strong>{job.company}</strong> will be
-          deactivated and removed from the public site. You can reactivate it from
-          Supabase if needed.
+          permanently deleted from the database and removed from the public site.
+          This cannot be undone.
         </>
       ),
       confirmText: 'Yes, delete',
@@ -181,7 +184,7 @@ export default function AdminPage() {
             body: JSON.stringify({ id: job.id }),
           });
           if (r.ok) {
-            pushToast('success', `"${job.title}" deleted successfully.`);
+            pushToast('success', `"${job.title}" deleted permanently.`);
             load();
           } else {
             const d = await r.json().catch(() => ({}));

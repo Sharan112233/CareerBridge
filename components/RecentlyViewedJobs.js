@@ -4,20 +4,18 @@
 
 import React from 'react';
 import Link from 'next/link';
+import CompanyLogo from './CompanyLogo';
 
 const STORAGE_KEY = 'cb_recently_viewed';
-const MAX_STORED = 10;   // how many we keep in storage
-const MAX_SHOWN  = 4;    // how many we render in the widget
+const MAX_STORED = 10;
+const MAX_SHOWN = 4;
 
-// Call this from a job detail page to record a visit.
-// Safe to call on every render — it deduplicates by slug and keeps the newest entry.
 export function pushRecentlyViewed(job) {
   if (typeof window === 'undefined' || !job || !job.slug) return;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     const prev = raw ? JSON.parse(raw) : [];
     const list = Array.isArray(prev) ? prev : [];
-    // Remove any existing entry for the same slug, then prepend
     const filtered = list.filter((x) => x && x.slug !== job.slug);
     const next = [
       {
@@ -39,7 +37,6 @@ export function pushRecentlyViewed(job) {
   }
 }
 
-// Read helper (exported in case other pages want to show it too)
 export function getRecentlyViewed() {
   if (typeof window === 'undefined') return [];
   try {
@@ -60,8 +57,6 @@ export default function RecentlyViewedJobs({ excludeId, excludeSlug }) {
     setItems(getRecentlyViewed());
   }, []);
 
-  // Don't render during SSR / first paint — prevents hydration mismatch
-  // because localStorage content varies per browser.
   if (!mounted) return null;
 
   const filtered = items
@@ -89,30 +84,24 @@ export default function RecentlyViewedJobs({ excludeId, excludeSlug }) {
       </div>
 
       <div style={styles.grid}>
-        {filtered.map((j) => {
-          const initials = (j.company || 'CO')
-            .split(' ')
-            .map((w) => w[0] || '')
-            .join('')
-            .slice(0, 2)
-            .toUpperCase() || 'CO';
-          const bg = j.logo_color || '#2563EB';
-          return (
-            <Link key={j.slug} href={`/${j.slug}`} style={styles.item}>
-              <div style={{ ...styles.logo, background: bg }}>
-                <span style={styles.logoText}>{initials}</span>
+        {filtered.map((j) => (
+          <Link key={j.slug} href={`/${j.slug}`} style={styles.item}>
+            <CompanyLogo
+              company={j.company}
+              size={38}
+              borderRadius={8}
+              fallbackColor={j.logo_color}
+            />
+            <div style={styles.itemMeta}>
+              <div style={styles.company}>{j.company}</div>
+              <div style={styles.itemTitle}>{j.title}</div>
+              <div style={styles.itemSub}>
+                {j.location && <span>📍 {j.location}</span>}
+                {j.salary && <span style={{ marginLeft: 10, color: 'var(--success)' }}>💰 {j.salary}</span>}
               </div>
-              <div style={styles.itemMeta}>
-                <div style={styles.company}>{j.company}</div>
-                <div style={styles.itemTitle}>{j.title}</div>
-                <div style={styles.itemSub}>
-                  {j.location && <span>📍 {j.location}</span>}
-                  {j.salary && <span style={{ marginLeft: 10, color: 'var(--success)' }}>💰 {j.salary}</span>}
-                </div>
-              </div>
-            </Link>
-          );
-        })}
+            </div>
+          </Link>
+        ))}
       </div>
     </section>
   );
@@ -165,25 +154,7 @@ const styles = {
     textDecoration: 'none',
     transition: 'all 0.15s',
   },
-  logo: {
-    width: 38,
-    height: 38,
-    borderRadius: 8,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
-  },
-  logoText: {
-    color: '#fff',
-    fontWeight: 700,
-    fontSize: 13,
-    letterSpacing: 0.5,
-  },
-  itemMeta: {
-    minWidth: 0,
-    flex: 1,
-  },
+  itemMeta: { minWidth: 0, flex: 1 },
   company: {
     fontSize: 10,
     fontWeight: 700,

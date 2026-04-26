@@ -47,8 +47,9 @@ export default async function handler(req, res) {
   if (req.method === 'DELETE') {
     const { id } = req.body || {};
     if (!id) return res.status(400).json({ error: 'id required' });
-    // soft delete
-    const { error } = await admin.from('jobs').update({ is_active: false }).eq('id', id);
+    // HARD DELETE — row is removed from the database permanently.
+    // No soft-delete flag, no recovery. The admin UI shows a toast on success.
+    const { error } = await admin.from('jobs').delete().eq('id', id);
     if (error) return res.status(500).json({ error: error.message });
     return res.status(200).json({ ok: true });
   }

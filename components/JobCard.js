@@ -2,18 +2,11 @@
 import React from 'react';
 import Link from 'next/link';
 import styles from '../styles/JobCard.module.css';
-
-const COMPANY_COLORS = {
-  Wipro:'#1a73e8', Infosys:'#007DC1', TCS:'#003087',
-  Accenture:'#A100FF', HCL:'#0076C0', Cognizant:'#1DA462',
-  Amazon:'#FF9900', Google:'#4285F4', Microsoft:'#00A4EF',
-  Capgemini:'#0070AD',
-};
+import CompanyLogo from './CompanyLogo';
 
 // "NEW" badge only shown for jobs posted within this many days.
 const NEW_BADGE_DAYS = 3;
 
-// Plain functions — no hooks, no state. Runs once per render.
 function daysSince(dateStr) {
   if (!dateStr) return null;
   const diff = Math.floor((Date.now() - new Date(dateStr)) / 86400000);
@@ -33,18 +26,20 @@ function JobCard({ job }) {
   if (!job || !job.slug) return null;
 
   const company = job.company || 'Company';
-  const initials = company.split(' ').map((w) => w[0] || '').join('').slice(0, 2).toUpperCase() || 'CO';
-  const bg = COMPANY_COLORS[company] || job.logo_color || '#2563EB';
-
   const ageDays = daysSince(job.created_at);
   const isNew = ageDays !== null && ageDays <= NEW_BADGE_DAYS;
 
   return (
     <Link href={`/${job.slug}`} className={styles.card}>
       <div className={styles.top}>
-        <div className={styles.logo} style={{ background: bg }}>
-          <span className={styles.logoText}>{initials}</span>
-        </div>
+        {/* Logo: real SVG if we have one, colored letter box if not.
+            48px matches the existing .logo class size. */}
+        <CompanyLogo
+          company={company}
+          size={48}
+          borderRadius={10}
+          fallbackColor={job.logo_color}
+        />
         <div className={styles.meta}>
           <div className={styles.company}>{company}</div>
           <div className={styles.title}>{job.title || ''}</div>
@@ -97,13 +92,8 @@ function JobCard({ job }) {
   );
 }
 
-// React.memo skips re-render when props (job) are shallow-equal.
-// Typing in the search box on the home page re-renders the parent,
-// which previously caused every visible JobCard to re-run its function
-// even though its `job` prop was identical. This fixes that.
-//
-// Custom comparator: we only care if the job id changed — all other
-// job fields are stable while on the same listing page.
+// React.memo skips re-render when props are shallow-equal.
+// Typing in the search box re-renders the parent, but JobCards stay stable.
 export default React.memo(JobCard, (prev, next) => {
   return prev.job?.id === next.job?.id;
 });

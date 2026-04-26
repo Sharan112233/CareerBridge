@@ -1,11 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-
-  // Use SWC's minifier — ~15% smaller bundles than Terser for our code.
   swcMinify: true,
 
-  // Strip console.log in production builds. Keeps console.error/warn.
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production'
       ? { exclude: ['error', 'warn'] }
@@ -19,8 +16,6 @@ const nextConfig = {
     formats: ['image/avif', 'image/webp'],
   },
 
-  // Turn off the "X-Powered-By: Next.js" header — tiny byte saving + a bit of
-  // defense-in-depth (don't advertise the stack).
   poweredByHeader: false,
 
   async headers() {
@@ -38,8 +33,13 @@ const nextConfig = {
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       },
       {
-        // Longer cache for fonts — they're immutable once hashed.
         source: '/_next/static/media/(.*)',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+      },
+      {
+        // Cache company logos for 1 year. Logos rarely change — and when
+        // they do, we update the slug or the file name acts as a manual cache-buster.
+        source: '/logos/(.*)',
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       },
       {
