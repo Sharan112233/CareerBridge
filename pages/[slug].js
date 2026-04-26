@@ -14,6 +14,7 @@ import JobCard from '../components/JobCard';
 import Footer from '../components/Footer';
 import ShareButtons from '../components/ShareButtons';
 import RecentlyViewedJobs, { pushRecentlyViewed } from '../components/RecentlyViewedJobs';
+import CompanyLogo from '../components/CompanyLogo';
 import styles from '../styles/JobDetail.module.css';
 
 
@@ -173,9 +174,12 @@ export default function JobDetail({ job, relatedJobs, cleanDescription, jobLd, b
 
           <div className={styles.headerCard}>
             <div className={styles.headerTop}>
-              <div className={styles.companyLogo} style={{ background: job.logo_color || '#2563EB' }}>
-                {(job.company || 'CO').slice(0, 2).toUpperCase()}
-              </div>
+              <CompanyLogo
+                company={job.company}
+                size={60}
+                borderRadius={12}
+                fallbackColor={job.logo_color}
+              />
               <div className={styles.headerMeta}>
                 <div className={styles.companyName}>{job.company}</div>
                 <h2 className={styles.jobTitle}>{job.title}</h2>
