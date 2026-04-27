@@ -4,7 +4,6 @@ import React from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import DOMPurify from 'isomorphic-dompurify';
 import { getAllSlugs, getJobBySlug, getAllJobs } from '../lib/supabase';
 import { SITE_NAME, SITE_URL, RESERVED_SLUGS } from '../lib/constants';
 import Layout from '../components/Layout';
@@ -558,10 +557,18 @@ const related = allJobs
     (Array.isArray(j.tags) && j.tags.some((t) => jobTags.includes(t)))
   ))
   .slice(0, 3);
-  const cleanDescription = DOMPurify.sanitize(
-    (job.description || '').replace(/\n/g, '<br/>'),
-    { ALLOWED_TAGS: ['br', 'p', 'strong', 'em', 'ul', 'ol', 'li', 'a', 'b', 'i'], ALLOWED_ATTR: ['href', 'target', 'rel'] }
-  );
+// Plain text → HTML conversion. No HTML allowed from the source — admin
+// types plain sentences in the form. We escape any <, >, & so they render
+// as literal characters, then convert newlines to <br/> tags.
+// This used to use isomorphic-dompurify but that package's dependency
+// chain (jsdom → html-encoding-sniffer → @exodus/bytes) breaks on Vercel
+// with ERR_REQUIRE_ESM. Plain escape is safer AND doesn't pull jsdom.
+const cleanDescription = (job.description || '')
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;')
+  .replace(/\n/g, '<br/>');
 
   const isExpired = job.valid_through ? new Date(job.valid_through) < new Date() : false;
 
