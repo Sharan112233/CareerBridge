@@ -105,7 +105,7 @@ careerbridge/
 ├── public/
 │   ├── ads.txt                 ← Replace placeholder with real AdSense pub ID
 │   ├── robots.txt
-│   └── favicon.ico             ← Add your own (favicon.io)
+│   └── favicon.ico      ← Add your own (favicon.io)
 ├── supabase/
 │   ├── schema.sql              ← Run first
 │   ├── indexes.sql             ← Run second (performance)

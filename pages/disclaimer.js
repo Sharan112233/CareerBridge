@@ -90,7 +90,7 @@ export default function Disclaimer() {
 
       <h2 style={h2}>Trademark Notice</h2>
       <p>
-        {SITE_NAME}          All company names, logos, and trademarks displayed on CareerBridge are the property of their respective owners. CareerBridge displays these marks only for the purpose of identifying job opportunities posted by these companies. Use of these marks does not imply any endorsement, sponsorship, or affiliation between CareerBridge and the trademark holders. If you are a trademark owner and wish to have your logo removed, please contact us at <a href={`mailto:${CONTACT_EMAIL}`} style={link}>{CONTACT_EMAIL}</a>
+        {SITE_NAME} All company names, logos, and trademarks displayed on CareerBridge are the property of their respective owners. CareerBridge displays these marks only for the purpose of identifying job opportunities posted by these companies. Use of these marks does not imply any endorsement, sponsorship, or affiliation between CareerBridge and the trademark holders. If you are a trademark owner and wish to have your logo removed, please contact us at <a href={`mailto:${CONTACT_EMAIL}`} style={link}>{CONTACT_EMAIL}</a>
 
       </p>
          

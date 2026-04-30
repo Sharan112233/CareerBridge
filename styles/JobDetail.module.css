@@ -1,3 +1,5 @@
+/* styles/JobDetail.module.css */
+
 .loading { max-width: 800px; margin: 80px auto; text-align: center; color: var(--text-faint); font-size: 16px; }
 .notFound { max-width: 600px; margin: 80px auto; text-align: center; padding: 40px 20px; }
 .notFound h1 { font-size: 28px; margin-bottom: 10px; color: var(--text); }
@@ -20,7 +22,7 @@
 .companyLogo { width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 18px; flex-shrink: 0; }
 .headerMeta { flex: 1; min-width: 0; }
 .companyName { font-size: 12px; font-weight: 600; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
-.jobTitle { font-size: 22px; font-weight: 800; color: var(--text); line-height: 1.25; margin-bottom: 10px; letter-spacing: -0.3px; }
+.jobTitle { font-size: 22px; font-weight: 800; color: var(--text); line-height: 1.25; margin-bottom: 10px; letter-spacing: -0.3px; word-wrap: break-word; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .chip { background: var(--bg-muted); font-size: 12px; color: var(--text-muted); padding: 4px 10px; border-radius: 16px; font-weight: 500; }
 .chipGreen { background: var(--success-soft); color: var(--success-text); }
@@ -29,7 +31,7 @@
 .applySection { border-top: 1px solid var(--border); padding-top: 16px; }
 .applyMeta { display: flex; gap: 16px; font-size: 12px; color: var(--text-soft); margin-bottom: 14px; flex-wrap: wrap; }
 .applyBtns { display: flex; gap: 10px; flex-wrap: wrap; }
-.applyBtn { background: var(--accent); color: #fff; border: none; padding: 12px 22px; border-radius: 10px; font-weight: 700; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; }
+.applyBtn { background: var(--accent); color: #fff; border: none; padding: 12px 22px; border-radius: 10px; font-weight: 700; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
 .applyBtn:hover { background: var(--accent-hover); }
 .applyBtn:disabled { opacity: 0.6; cursor: wait; }
 .applying { background: var(--accent-hover); }
@@ -39,7 +41,7 @@
 
 .card { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
 .cardTitle { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 12px; }
-.description { font-size: 14px; color: var(--text-muted); line-height: 1.7; }
+.description { font-size: 14px; color: var(--text-muted); line-height: 1.7; word-wrap: break-word; overflow-wrap: break-word; }
 .twoCol { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
 .list { list-style: none; padding: 0; }
 .list li { display: flex; gap: 8px; padding: 5px 0; font-size: 13px; color: var(--text-muted); line-height: 1.6; }
@@ -57,10 +59,10 @@
 
 .sideCard { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
 .sideTitle { font-size: 13px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
-.sideRow { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.sideRow { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
 .sideRow:last-of-type { border-bottom: none; }
-.sideKey { color: var(--text-soft); }
-.sideVal { color: var(--text); font-weight: 500; text-align: right; }
+.sideKey { color: var(--text-soft); flex-shrink: 0; }
+.sideVal { color: var(--text); font-weight: 500; text-align: right; word-break: break-word; }
 
 .shareBar { display: flex; gap: 8px; flex-wrap: wrap; }
 .shareIcon { width: 40px; height: 40px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 13px; border: none; cursor: pointer; transition: transform 0.15s; }
@@ -71,11 +73,6 @@
 .faqQ { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
 .faqA { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
 
-@media (max-width: 900px) {
-  .layout { grid-template-columns: 1fr; }
-  .twoCol { grid-template-columns: 1fr; }
-  .bottomCta { flex-direction: column; align-items: flex-start; }
-}
 /* ───── Big SEO title block ───── */
 .bigTitleWrap {
   max-width: 1200px;
@@ -83,7 +80,7 @@
   padding: 0 20px;
 }
 .bigTitle {
-  font-size: clamp(22px, 3.5vw, 32px);
+  font-size: clamp(20px, 3.5vw, 32px);
   font-weight: 800;
   line-height: 1.25;
   color: var(--text);
@@ -93,6 +90,8 @@
   border: 1px solid var(--border);
   border-left: 4px solid var(--accent);
   border-radius: 12px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 /* ───── How to Apply list ───── */
@@ -134,4 +133,225 @@
   color: var(--text-muted);
   line-height: 1.7;
   padding: 4px 0;
+}
+
+/* ────────────────────────────────────────────────────────────────
+   TABLET — collapse sidebar to single column
+   ──────────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  .twoCol { grid-template-columns: 1fr; }
+  .bottomCta { flex-direction: column; align-items: stretch; text-align: center; }
+  .applyBtnLarge { width: 100%; }
+  .relatedGrid { grid-template-columns: 1fr; }
+}
+
+/* ────────────────────────────────────────────────────────────────
+   MOBILE PHONE — < 600px: tighten padding, stack everything,
+   make buttons full-width tap targets
+   ──────────────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .breadcrumb {
+    padding: 0 14px;
+    font-size: 12px;
+  }
+
+  .expiredBanner {
+    margin: 10px 14px 0;
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+
+  .bigTitleWrap {
+    margin: 10px auto 0;
+    padding: 0 14px;
+  }
+  .bigTitle {
+    padding: 14px 16px;
+    border-radius: 10px;
+  }
+
+  .layout {
+    margin: 14px auto 32px;
+    padding: 0 14px;
+    gap: 14px;
+  }
+
+  /* Header card: pull padding in, allow company logo to shrink slightly */
+  .headerCard {
+    padding: 16px;
+    border-radius: 12px;
+  }
+  .headerTop {
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .companyLogo {
+    width: 48px;
+    height: 48px;
+    font-size: 15px;
+  }
+  .jobTitle {
+    font-size: 18px;
+    line-height: 1.3;
+    margin-bottom: 8px;
+  }
+  .companyName {
+    font-size: 11px;
+  }
+  .chip {
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+  .newBadge {
+    font-size: 10px;
+    padding: 3px 8px;
+    align-self: flex-start;
+  }
+
+  .applySection {
+    padding-top: 14px;
+  }
+  .applyMeta {
+    gap: 8px;
+    font-size: 12px;
+  }
+  /* Apply button stretches the full width on phone — bigger tap target */
+  .applyBtns {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .applyBtn {
+    width: 100%;
+    padding: 13px 18px;
+    font-size: 14px;
+    text-align: center;
+  }
+  .shareBtn {
+    width: 100%;
+    justify-content: center;
+  }
+  .applyNote {
+    font-size: 11px;
+    margin-top: 12px;
+  }
+
+  /* Content cards — tighter padding so words breathe */
+  .card {
+    padding: 16px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+  }
+  .cardTitle {
+    font-size: 15px;
+    margin-bottom: 10px;
+  }
+  .description {
+    font-size: 14px;
+    line-height: 1.65;
+  }
+  .list li {
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  /* How-to-apply / interview lists */
+  .howToList,
+  .interviewList {
+    padding-left: 18px;
+  }
+  .howToList li,
+  .interviewList li {
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  /* Fraud note */
+  .fraudNote {
+    padding: 12px 14px;
+    font-size: 13px;
+  }
+
+  /* Bottom CTA stacks buttons full width */
+  .bottomCta {
+    padding: 18px;
+    margin: 14px 0;
+    border-radius: 10px;
+  }
+  .ctaTitle {
+    font-size: 16px;
+  }
+  .ctaSub {
+    font-size: 13px;
+  }
+  .applyBtnLarge {
+    width: 100%;
+    padding: 13px 20px;
+  }
+
+  /* Sidebar Quick Info — switch to label-on-top, value-below
+     so long values like "Last date to apply" don't squeeze into 30% width */
+  .sideCard {
+    padding: 14px;
+  }
+  .sideRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: 8px 0;
+  }
+  .sideKey {
+    font-size: 11px;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .sideVal {
+    text-align: left;
+    font-size: 14px;
+    width: 100%;
+  }
+
+  /* FAQ — slightly smaller */
+  .faqItem {
+    padding: 10px 0;
+  }
+  .faqQ {
+    font-size: 14px;
+  }
+  .faqA {
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  /* Share icons — make them bigger tap targets on phone (44px is iOS standard) */
+  .shareIcon {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* ────────────────────────────────────────────────────────────────
+   VERY SMALL PHONES — < 360px: minimal extra tightening
+   (some Indian budget Android phones are 320-360px wide)
+   ──────────────────────────────────────────────────────────────── */
+@media (max-width: 360px) {
+  .breadcrumb,
+  .layout,
+  .bigTitleWrap {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .headerCard,
+  .card {
+    padding: 14px;
+  }
+  .jobTitle {
+    font-size: 17px;
+  }
+  .applyBtn,
+  .applyBtnLarge {
+    padding: 12px 14px;
+    font-size: 13px;
+  }
 }

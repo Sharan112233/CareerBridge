@@ -612,7 +612,7 @@ function ToastStack({ toasts, onDismiss }) {
           className={`${styles.toastItem} ${
             t.type === 'success' ? styles.toastSuccess :
             t.type === 'error'   ? styles.toastError   :
-                                   styles.toastInfo
+                                  styles.toastInfo
           }`}
           role={t.type === 'error' ? 'alert' : 'status'}
         >
