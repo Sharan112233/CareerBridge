@@ -23,3 +23,62 @@
 
 .expired { opacity: 0.6; }
 .expiredBadge { background: var(--danger); color: #fff; font-size: 10px; font-weight: 700; padding: 3px 7px; border-radius: 10px; letter-spacing: 0.3px; }
+
+@media (max-width: 768px) {
+  .card {
+    padding: 14px;
+    border-radius: 14px;
+    border-width: 1.5px;
+  }
+  .card:hover {
+    transform: none;
+    box-shadow: var(--card-shadow);
+  }
+  .top {
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .company {
+    font-size: 11px;
+  }
+  .title {
+    font-size: 16px;
+    line-height: 1.25;
+  }
+  .newBadge {
+    font-size: 9px;
+    padding: 4px 8px;
+  }
+  .info {
+    gap: 8px;
+    margin-bottom: 10px;
+    font-size: 12px;
+  }
+  .infoItem {
+    background: var(--bg-muted);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 4px 8px;
+  }
+  .salary {
+    font-size: 15px;
+    margin-bottom: 10px;
+  }
+  .tag {
+    font-size: 11px;
+    padding: 4px 9px;
+  }
+  .footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding-top: 10px;
+  }
+  .posted {
+    font-size: 12px;
+  }
+  .viewBtn {
+    font-size: 13px;
+    font-weight: 700;
+  }
+}

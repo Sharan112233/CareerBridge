@@ -144,6 +144,24 @@
   .bottomCta { flex-direction: column; align-items: stretch; text-align: center; }
   .applyBtnLarge { width: 100%; }
   .relatedGrid { grid-template-columns: 1fr; }
+  .sideRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: 8px 0;
+  }
+  .sideKey {
+    font-size: 11px;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .sideVal {
+    width: 100%;
+    text-align: left;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
 }
 
 /* ────────────────────────────────────────────────────────────────

@@ -23,8 +23,69 @@
 .mobileLink { display: block; padding: 10px 0; font-size: 14px; color: var(--text-muted); border-bottom: 1px solid var(--border); }
 
 @media (max-width: 768px) {
+  .inner {
+    padding: 10px 14px;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .logo {
+    font-size: 18px;
+    order: 1;
+  }
+  .logoDot {
+    font-size: 11px;
+  }
   .links { display: none; }
-  .searchWrap { max-width: none; }
-  .burger { display: inline-flex; }
-  .mobileMenu { display: block; }
+  .searchWrap {
+    max-width: none;
+    width: 100%;
+    order: 4;
+    flex: 0 0 100%;
+  }
+  .searchInput {
+    height: 42px;
+    font-size: 15px;
+    border-radius: 12px;
+  }
+  .themeBtn {
+    order: 2;
+    margin-left: auto;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+  }
+  .burger {
+    display: inline-flex;
+    order: 3;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    color: var(--text-muted);
+  }
+  .mobileMenu {
+    display: block;
+    padding: 8px 14px 14px;
+    background: var(--bg);
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    z-index: 120;
+    border-top: 1px solid var(--border);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
+  }
+  .mobileLink {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-top: 8px;
+    padding: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+  }
 }
