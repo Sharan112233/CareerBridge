@@ -153,11 +153,20 @@ export default function Home({ initialJobs, totalJobs, companyCount }) {
   }, [page, loadedPages, hydrated]);
 
   const currentPageJobs = loadedPages[page] || [];
+  
+  // Get all loaded jobs from all pages for search
+  const allLoadedJobs = React.useMemo(() => {
+    return Object.values(loadedPages).flat();
+  }, [loadedPages]);
 
   const filteredJobs = React.useMemo(() => {
     const q = search.trim().toLowerCase();
+    // When searching, search across ALL loaded jobs
+    const jobsToFilter = q ? allLoadedJobs : currentPageJobs;
+    
     if (!q && filter === 'All') return currentPageJobs;
-    return currentPageJobs.filter((j) => {
+    
+    return jobsToFilter.filter((j) => {
       const matchSearch =
         !q ||
         (j.title || '').toLowerCase().includes(q) ||
@@ -171,11 +180,15 @@ export default function Home({ initialJobs, totalJobs, companyCount }) {
         filter === 'Fresher'  ? Boolean(j.is_fresher) : true;
       return matchSearch && matchFilter;
     });
-  }, [currentPageJobs, search, filter]);
+  }, [currentPageJobs, allLoadedJobs, search, filter]);
 
   React.useEffect(() => {
     if (!hydrated) return;
     setPage(1);
+    // Scroll to job results when user searches
+    if (search && listTopRef.current) {
+      listTopRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }, [filter, search, hydrated]);
 
   const goToPage = (p) => {
@@ -223,7 +236,12 @@ export default function Home({ initialJobs, totalJobs, companyCount }) {
               <br />
               One click → Official Company Application Page.
             </p>
-            <a href="#jobs" className={styles.heroBtn}>
+            <a href="#jobs" className={styles.heroBtn} onClick={(e) => {
+              e.preventDefault();
+              if (listTopRef.current) {
+                listTopRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+            }}>
               Explore Jobs
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M5 12h14M12 5l7 7-7 7"/>
@@ -268,37 +286,37 @@ export default function Home({ initialJobs, totalJobs, companyCount }) {
           <div className={styles.heroIllustration}>
             <svg width="500" height="400" viewBox="0 0 500 400" fill="none" xmlns="http://www.w3.org/2000/svg">
               {/* Browser Window */}
-              <rect x="50" y="40" width="280" height="200" rx="12" fill="#fff" stroke="#E5E7EB" strokeWidth="2"/>
-              <rect x="50" y="40" width="280" height="30" rx="12" fill="#F3F4F6"/>
+              <rect x="50" y="40" width="280" height="200" rx="12" fill="var(--bg-elevated)" stroke="var(--border)" strokeWidth="2"/>
+              <rect x="50" y="40" width="280" height="30" rx="12" fill="var(--bg-muted)"/>
               <circle cx="68" cy="55" r="4" fill="#DC2626"/>
               <circle cx="82" cy="55" r="4" fill="#FBBF24"/>
               <circle cx="96" cy="55" r="4" fill="#16A34A"/>
               {/* Browser content */}
-              <circle cx="90" cy="100" r="8" fill="#E5E7EB"/>
-              <rect x="110" y="92" width="180" height="8" rx="4" fill="#E5E7EB"/>
-              <rect x="110" y="105" width="120" height="6" rx="3" fill="#F3F4F6"/>
-              <circle cx="90" cy="140" r="8" fill="#E5E7EB"/>
-              <rect x="110" y="132" width="180" height="8" rx="4" fill="#E5E7EB"/>
-              <rect x="110" y="145" width="140" height="6" rx="3" fill="#F3F4F6"/>
-              <circle cx="90" cy="180" r="8" fill="#E5E7EB"/>
-              <rect x="110" y="172" width="180" height="8" rx="4" fill="#E5E7EB"/>
-              <rect x="110" y="185" width="100" height="6" rx="3" fill="#F3F4F6"/>
+              <circle cx="90" cy="100" r="8" fill="var(--text-soft)" opacity="0.3"/>
+              <rect x="110" y="92" width="180" height="8" rx="4" fill="var(--text-soft)" opacity="0.3"/>
+              <rect x="110" y="105" width="120" height="6" rx="3" fill="var(--bg-muted)"/>
+              <circle cx="90" cy="140" r="8" fill="var(--text-soft)" opacity="0.3"/>
+              <rect x="110" y="132" width="180" height="8" rx="4" fill="var(--text-soft)" opacity="0.3"/>
+              <rect x="110" y="145" width="140" height="6" rx="3" fill="var(--bg-muted)"/>
+              <circle cx="90" cy="180" r="8" fill="var(--text-soft)" opacity="0.3"/>
+              <rect x="110" y="172" width="180" height="8" rx="4" fill="var(--text-soft)" opacity="0.3"/>
+              <rect x="110" y="185" width="100" height="6" rx="3" fill="var(--bg-muted)"/>
               {/* Person sitting */}
-              <ellipse cx="400" cy="360" rx="60" ry="12" fill="#E5E7EB"/>
+              <ellipse cx="400" cy="360" rx="60" ry="12" fill="var(--text-soft)" opacity="0.2"/>
               {/* Chair */}
-              <path d="M350 280 L350 360 M370 280 L370 360 M340 360 L380 360 M340 280 L380 280 Q390 260 390 240 L390 200 M340 200 L390 200" stroke="#111827" strokeWidth="3" fill="none"/>
+              <path d="M350 280 L350 360 M370 280 L370 360 M340 360 L380 360 M340 280 L380 280 Q390 260 390 240 L390 200 M340 200 L390 200" stroke="var(--text)" strokeWidth="3" fill="none"/>
               {/* Person body */}
-              <circle cx="380" cy="160" r="22" fill="#FEE2E2" stroke="#111827" strokeWidth="2"/>
-              <path d="M380 182 L380 250" stroke="#111827" strokeWidth="3"/>
-              <path d="M380 200 L350 230" stroke="#111827" strokeWidth="3"/>
-              <path d="M380 200 L410 220" stroke="#111827" strokeWidth="3"/>
-              <path d="M380 250 L360 300" stroke="#111827" strokeWidth="3"/>
-              <path d="M380 250 L400 300" stroke="#111827" strokeWidth="3"/>
+              <circle cx="380" cy="160" r="22" fill="#FEE2E2" stroke="var(--text)" strokeWidth="2"/>
+              <path d="M380 182 L380 250" stroke="var(--text)" strokeWidth="3"/>
+              <path d="M380 200 L350 230" stroke="var(--text)" strokeWidth="3"/>
+              <path d="M380 200 L410 220" stroke="var(--text)" strokeWidth="3"/>
+              <path d="M380 250 L360 300" stroke="var(--text)" strokeWidth="3"/>
+              <path d="M380 250 L400 300" stroke="var(--text)" strokeWidth="3"/>
               {/* Laptop */}
-              <rect x="370" y="215" width="60" height="40" rx="2" fill="#1F2937" stroke="#111827" strokeWidth="2"/>
+              <rect x="370" y="215" width="60" height="40" rx="2" fill="#1F2937" stroke="var(--text)" strokeWidth="2"/>
               <rect x="365" y="255" width="70" height="3" fill="#374151"/>
               {/* Plant */}
-              <ellipse cx="120" cy="300" rx="20" ry="8" fill="#6B7280"/>
+              <ellipse cx="120" cy="300" rx="20" ry="8" fill="var(--text-soft)" opacity="0.3"/>
               <path d="M120 300 L120 270 M115 280 Q110 275 108 270 M125 280 Q130 275 132 270 M115 285 Q108 282 105 278 M125 285 Q132 282 135 278" stroke="#16A34A" strokeWidth="2" fill="none"/>
             </svg>
           </div>

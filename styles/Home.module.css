@@ -1,19 +1,19 @@
-.hero { background: #F9FAFB; color: #111827; padding: 80px 20px 60px; border-bottom: 1px solid #E5E7EB; }
+.hero { background: var(--bg-elevated); color: var(--text); padding: 80px 20px 60px; border-bottom: 1px solid var(--border); }
 .heroInner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
 .heroContent { max-width: 600px; }
-.heroTag { display: inline-block; background: rgba(0,0,0,0.05); padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 16px; }
-.heroTitle { font-size: clamp(32px, 5vw, 48px); font-weight: 800; line-height: 1.15; margin: 0 0 16px; letter-spacing: -1.5px; color: #111827; }
-.heroAccent { color: #111827; display: block; }
-.heroSub { font-size: 16px; color: #6B7280; line-height: 1.7; margin: 0 0 32px; }
-.heroBtn { display: inline-flex; align-items: center; gap: 8px; background: #111827; color: #fff; padding: 14px 28px; border-radius: 12px; font-size: 15px; font-weight: 600; text-decoration: none; transition: all 0.2s; }
-.heroBtn:hover { background: #1F2937; transform: translateY(-1px); }
+.heroTag { display: inline-block; background: var(--bg-muted); padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 16px; }
+.heroTitle { font-size: clamp(32px, 5vw, 48px); font-weight: 800; line-height: 1.15; margin: 0 0 16px; letter-spacing: -1.5px; color: var(--text); }
+.heroAccent { color: var(--accent); display: block; }
+.heroSub { font-size: 16px; color: var(--text-soft); line-height: 1.7; margin: 0 0 32px; }
+.heroBtn { display: inline-flex; align-items: center; gap: 8px; background: var(--accent); color: #fff; padding: 14px 28px; border-radius: 12px; font-size: 15px; font-weight: 600; text-decoration: none; transition: all 0.2s; cursor: pointer; border: none; }
+.heroBtn:hover { background: var(--accent-hover); transform: translateY(-1px); }
 .heroIllustration { display: flex; align-items: center; justify-content: center; }
 .heroStats { display: flex; gap: 48px; margin-top: 32px; }
 .stat { display: flex; align-items: center; gap: 12px; }
-.statIcon { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: #fff; border-radius: 8px; border: 1px solid #E5E7EB; }
+.statIcon { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--bg-muted); border-radius: 8px; border: 1px solid var(--border); color: var(--text-soft); }
 .statContent { display: flex; flex-direction: column; }
-.statNum { font-size: 20px; font-weight: 800; color: #111827; }
-.statLabel { font-size: 12px; color: #6B7280; font-weight: 500; }
+.statNum { font-size: 20px; font-weight: 800; color: var(--text); }
+.statLabel { font-size: 12px; color: var(--text-soft); font-weight: 500; }
 .adWrap { max-width: 1200px; margin: 24px auto 0; padding: 0 20px; }
 .main { max-width: 1200px; margin: 32px auto; padding: 0 20px; }
 .sectionTop { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 8px; margin-bottom: 20px; scroll-margin-top: 16px; }
@@ -47,55 +47,71 @@
 
 @media (max-width: 768px) {
   .hero {
-    padding: 26px 14px 22px;
+    padding: 40px 14px 32px;
   }
   .heroInner {
     grid-template-columns: 1fr;
-    gap: 24px;
+    gap: 32px;
     text-align: left;
     max-width: 100%;
+  }
+  .heroContent {
+    display: flex;
+    flex-direction: column;
   }
   .heroIllustration {
     display: none;
   }
   .heroTitle {
-    font-size: clamp(24px, 8vw, 32px);
-    line-height: 1.22;
-    letter-spacing: -0.4px;
-    margin-bottom: 10px;
+    font-size: clamp(28px, 8vw, 36px);
+    line-height: 1.2;
+    letter-spacing: -0.8px;
+    margin-bottom: 12px;
   }
   .heroTitle br {
     display: none;
   }
   .heroSub {
-    font-size: 13.5px;
+    font-size: 14px;
     line-height: 1.6;
-    margin-bottom: 14px;
-    max-width: 52ch;
+    margin-bottom: 20px;
+    max-width: 100%;
   }
   .heroSub br {
     display: none;
   }
+  .heroBtn {
+    align-self: flex-start;
+    margin-bottom: 24px;
+  }
   .heroStats {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    justify-content: initial;
-    gap: 8px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
     width: 100%;
+    margin-top: 0;
+    order: 10;
   }
   .stat {
-    background: rgba(255,255,255,0.12);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 10px;
-    align-items: flex-start;
-    padding: 8px 9px;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    background: var(--bg-muted);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 8px;
     min-width: 0;
+    gap: 8px;
+  }
+  .statIcon {
+    width: 36px;
+    height: 36px;
   }
   .statNum {
-    font-size: 17px;
+    font-size: 18px;
   }
   .statLabel {
-    font-size: 10px;
+    font-size: 11px;
     line-height: 1.3;
   }
   .adWrap, .main {
@@ -163,21 +179,30 @@
 
 @media (max-width: 420px) {
   .hero {
-    padding: 22px 12px 18px;
+    padding: 32px 12px 24px;
   }
   .heroTitle {
-    font-size: 22px;
+    font-size: 26px;
     line-height: 1.25;
   }
   .heroSub {
     font-size: 13px;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
   }
   .heroStats {
-    grid-template-columns: 1fr;
-    gap: 7px;
+    gap: 8px;
   }
   .stat {
-    padding: 9px 10px;
+    padding: 12px 6px;
+  }
+  .statIcon {
+    width: 32px;
+    height: 32px;
+  }
+  .statNum {
+    font-size: 16px;
+  }
+  .statLabel {
+    font-size: 10px;
   }
 }

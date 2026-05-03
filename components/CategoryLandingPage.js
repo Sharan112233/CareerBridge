@@ -22,7 +22,12 @@ export default function CategoryLandingPage({
   jobs,
   breadcrumbs, // array of [label, href|null]
 }) {
-  const [visible, setVisible] = React.useState(9);
+  const [page, setPage] = React.useState(1);
+  const jobsPerPage = 9;
+  const totalPages = Math.ceil(jobs.length / jobsPerPage);
+  const startIndex = (page - 1) * jobsPerPage;
+  const endIndex = startIndex + jobsPerPage;
+  const currentJobs = jobs.slice(startIndex, endIndex);
 
   return (
     <Layout>
@@ -41,14 +46,14 @@ export default function CategoryLandingPage({
         <div className={styles.heroInner}>
           <div className={styles.heroContent}>
             {breadcrumbs && (
-              <nav style={{ marginBottom: '16px', fontSize: '13px', color: '#6B7280' }}>
+              <nav style={{ marginBottom: '16px', fontSize: '13px', color: 'var(--text-soft)' }}>
                 {breadcrumbs.map(([label, href], i) => (
                   <span key={label}>
                     {i > 0 && <span style={{ margin: '0 8px', opacity: 0.5 }}>›</span>}
                     {href ? (
-                      <Link href={href} style={{ color: '#6B7280', textDecoration: 'none' }}>{label}</Link>
+                      <Link href={href} style={{ color: 'var(--text-soft)', textDecoration: 'none' }}>{label}</Link>
                     ) : (
-                      <span style={{ fontWeight: 600, color: '#111827' }}>{label}</span>
+                      <span style={{ fontWeight: 600, color: 'var(--text)' }}>{label}</span>
                     )}
                   </span>
                 ))}
@@ -100,58 +105,42 @@ export default function CategoryLandingPage({
           <div className={styles.heroIllustration}>
             <svg width="500" height="400" viewBox="0 0 500 400" fill="none" xmlns="http://www.w3.org/2000/svg">
               {/* Browser Window */}
-              <rect x="50" y="40" width="280" height="200" rx="12" fill="#fff" stroke="#E5E7EB" strokeWidth="2"/>
-              <rect x="50" y="40" width="280" height="30" rx="12" fill="#F3F4F6"/>
+              <rect x="50" y="40" width="280" height="200" rx="12" fill="var(--bg-elevated)" stroke="var(--border)" strokeWidth="2"/>
+              <rect x="50" y="40" width="280" height="30" rx="12" fill="var(--bg-muted)"/>
               <circle cx="68" cy="55" r="4" fill="#DC2626"/>
               <circle cx="82" cy="55" r="4" fill="#FBBF24"/>
               <circle cx="96" cy="55" r="4" fill="#16A34A"/>
               {/* Browser content */}
-              <circle cx="90" cy="100" r="8" fill="#E5E7EB"/>
-              <rect x="110" y="92" width="180" height="8" rx="4" fill="#E5E7EB"/>
-              <rect x="110" y="105" width="120" height="6" rx="3" fill="#F3F4F6"/>
-              <circle cx="90" cy="140" r="8" fill="#E5E7EB"/>
-              <rect x="110" y="132" width="180" height="8" rx="4" fill="#E5E7EB"/>
-              <rect x="110" y="145" width="140" height="6" rx="3" fill="#F3F4F6"/>
-              <circle cx="90" cy="180" r="8" fill="#E5E7EB"/>
-              <rect x="110" y="172" width="180" height="8" rx="4" fill="#E5E7EB"/>
-              <rect x="110" y="185" width="100" height="6" rx="3" fill="#F3F4F6"/>
+              <circle cx="90" cy="100" r="8" fill="var(--text-soft)" opacity="0.3"/>
+              <rect x="110" y="92" width="180" height="8" rx="4" fill="var(--text-soft)" opacity="0.3"/>
+              <rect x="110" y="105" width="120" height="6" rx="3" fill="var(--bg-muted)"/>
+              <circle cx="90" cy="140" r="8" fill="var(--text-soft)" opacity="0.3"/>
+              <rect x="110" y="132" width="180" height="8" rx="4" fill="var(--text-soft)" opacity="0.3"/>
+              <rect x="110" y="145" width="140" height="6" rx="3" fill="var(--bg-muted)"/>
+              <circle cx="90" cy="180" r="8" fill="var(--text-soft)" opacity="0.3"/>
+              <rect x="110" y="172" width="180" height="8" rx="4" fill="var(--text-soft)" opacity="0.3"/>
+              <rect x="110" y="185" width="100" height="6" rx="3" fill="var(--bg-muted)"/>
               {/* Person sitting */}
-              <ellipse cx="400" cy="360" rx="60" ry="12" fill="#E5E7EB"/>
+              <ellipse cx="400" cy="360" rx="60" ry="12" fill="var(--text-soft)" opacity="0.2"/>
               {/* Chair */}
-              <path d="M350 280 L350 360 M370 280 L370 360 M340 360 L380 360 M340 280 L380 280 Q390 260 390 240 L390 200 M340 200 L390 200" stroke="#111827" strokeWidth="3" fill="none"/>
+              <path d="M350 280 L350 360 M370 280 L370 360 M340 360 L380 360 M340 280 L380 280 Q390 260 390 240 L390 200 M340 200 L390 200" stroke="var(--text)" strokeWidth="3" fill="none"/>
               {/* Person body */}
-              <circle cx="380" cy="160" r="22" fill="#FEE2E2" stroke="#111827" strokeWidth="2"/>
-              <path d="M380 182 L380 250" stroke="#111827" strokeWidth="3"/>
-              <path d="M380 200 L350 230" stroke="#111827" strokeWidth="3"/>
-              <path d="M380 200 L410 220" stroke="#111827" strokeWidth="3"/>
-              <path d="M380 250 L360 300" stroke="#111827" strokeWidth="3"/>
-              <path d="M380 250 L400 300" stroke="#111827" strokeWidth="3"/>
+              <circle cx="380" cy="160" r="22" fill="#FEE2E2" stroke="var(--text)" strokeWidth="2"/>
+              <path d="M380 182 L380 250" stroke="var(--text)" strokeWidth="3"/>
+              <path d="M380 200 L350 230" stroke="var(--text)" strokeWidth="3"/>
+              <path d="M380 200 L410 220" stroke="var(--text)" strokeWidth="3"/>
+              <path d="M380 250 L360 300" stroke="var(--text)" strokeWidth="3"/>
+              <path d="M380 250 L400 300" stroke="var(--text)" strokeWidth="3"/>
               {/* Laptop */}
-              <rect x="370" y="215" width="60" height="40" rx="2" fill="#1F2937" stroke="#111827" strokeWidth="2"/>
+              <rect x="370" y="215" width="60" height="40" rx="2" fill="#1F2937" stroke="var(--text)" strokeWidth="2"/>
               <rect x="365" y="255" width="70" height="3" fill="#374151"/>
               {/* Plant */}
-              <ellipse cx="120" cy="300" rx="20" ry="8" fill="#6B7280"/>
+              <ellipse cx="120" cy="300" rx="20" ry="8" fill="var(--text-soft)" opacity="0.3"/>
               <path d="M120 300 L120 270 M115 280 Q110 275 108 270 M125 280 Q130 275 132 270 M115 285 Q108 282 105 278 M125 285 Q132 282 135 278" stroke="#16A34A" strokeWidth="2" fill="none"/>
             </svg>
           </div>
         </div>
       </section>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
       <div className={styles.adWrap}>
         <AdBanner slot="leaderboard" />
@@ -167,25 +156,55 @@ export default function CategoryLandingPage({
         ) : (
           <>
             <div className={styles.grid}>
-              {jobs.slice(0, Math.min(3, visible)).map((j) => (
+              {currentJobs.slice(0, 3).map((j) => (
                 <JobCard key={j.id} job={j} />
               ))}
             </div>
-            {visible >= 3 && (
+            {currentJobs.length > 3 && (
               <div className={styles.adMid}><AdBanner slot="large" /></div>
             )}
             <div className={styles.grid}>
-              {jobs.slice(3, visible).map((j) => (
+              {currentJobs.slice(3).map((j) => (
                 <JobCard key={j.id} job={j} />
               ))}
             </div>
-            {visible < jobs.length && (
-              <div className={styles.loadMoreWrap}>
-                <button className={styles.loadMoreBtn} onClick={() => setVisible((v) => v + 6)}>
-                  Load More ({jobs.length - visible} remaining)
+
+            {totalPages > 1 && (
+              <nav className={styles.pagination} aria-label="Pagination">
+                <button
+                  className={styles.pageBtn}
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                >
+                  ← Prev
                 </button>
-              </div>
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
+                  .map((p, i, arr) => (
+                    <React.Fragment key={p}>
+                      {i > 0 && arr[i - 1] !== p - 1 && <span style={{ color: 'var(--text-faint)' }}>…</span>}
+                      <button
+                        className={`${styles.pageBtn} ${p === page ? styles.pageBtnActive : ''}`}
+                        onClick={() => setPage(p)}
+                        aria-current={p === page ? 'page' : undefined}
+                      >
+                        {p}
+                      </button>
+                    </React.Fragment>
+                  ))}
+                <button
+                  className={styles.pageBtn}
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
+                >
+                  Next →
+                </button>
+              </nav>
             )}
+
+            <div className={styles.pageStatus} aria-live="polite">
+              Page {page} of {totalPages} · Showing {currentJobs.length} jobs
+            </div>
           </>
         )}
 

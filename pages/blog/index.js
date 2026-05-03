@@ -7,6 +7,7 @@ import Footer from '../../components/Footer';
 import AdBanner from '../../components/AdBanner';
 import { getAllPostsMeta } from '../../lib/blog';
 import { SITE_NAME, SITE_URL } from '../../lib/constants';
+import styles from '../../styles/Blog.module.css';
 
 export default function BlogIndex({ posts }) {
   return (
@@ -17,35 +18,46 @@ export default function BlogIndex({ posts }) {
         <link rel="canonical" href={`${SITE_URL}/blog`} />
       </Head>
       <Navbar />
-      <main style={{ maxWidth: 860, margin: '32px auto', padding: '0 20px' }}>
-        <h1 style={{ fontSize: 32, fontWeight: 800, color: 'var(--text)', marginBottom: 6 }}>Career Blog</h1>
-        <p style={{ color: 'var(--text-soft)', marginBottom: 24 }}>
-          Interview tips, resume guides, and job-hunt advice.
-        </p>
+      <main className={styles.container}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>Career Blog</h1>
+          <p className={styles.subtitle}>
+            Interview tips, resume guides, and job-hunt advice.
+          </p>
+        </div>
 
-        <AdBanner slot="leaderboard" style={{ marginBottom: 24 }} />
+        <AdBanner slot="leaderboard" style={{ marginBottom: 32 }} />
 
         {posts.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-faint)' }}>
+          <div className={styles.empty}>
             No posts yet. Check back soon!
           </div>
         ) : (
-          <div style={{ display: 'grid', gap: 14 }}>
+          <div className={styles.grid}>
             {posts.map((p) => (
-              <Link key={p.slug} href={`/blog/${p.slug}`}
-                style={{ display: 'block', background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 12, padding: 18, transition: 'all 0.2s' }}>
-                <div style={{ fontSize: 12, color: 'var(--text-faint)', marginBottom: 4 }}>
-                  {new Date(p.date).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}
+              <Link key={p.slug} href={`/blog/${p.slug}`} className={styles.card}>
+                <div className={styles.cardHeader}>
+                  <time className={styles.date}>
+                    {new Date(p.date).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}
+                  </time>
+                  {p.tags?.length > 0 && (
+                    <div className={styles.tags}>
+                      {p.tags.slice(0, 2).map((t) => (
+                        <span key={t} className={styles.tag}>{t}</span>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                <h2 style={{ fontSize: 19, fontWeight: 700, color: 'var(--text)', marginBottom: 6 }}>{p.title}</h2>
-                <p style={{ fontSize: 14, color: 'var(--text-soft)', lineHeight: 1.5, margin: 0 }}>{p.description}</p>
-                {p.tags?.length > 0 && (
-                  <div style={{ marginTop: 10, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                    {p.tags.map((t) => (
-                      <span key={t} style={{ fontSize: 11, fontWeight: 600, color: 'var(--accent)', background: 'var(--accent-soft)', padding: '3px 8px', borderRadius: 10 }}>{t}</span>
-                    ))}
-                  </div>
-                )}
+                <h2 className={styles.cardTitle}>{p.title}</h2>
+                <p className={styles.cardDesc}>{p.description}</p>
+                <div className={styles.cardFooter}>
+                  <span className={styles.readMore}>
+                    Read article
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                  </span>
+                </div>
               </Link>
             ))}
           </div>
