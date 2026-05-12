@@ -416,7 +416,12 @@ export default function Home({ initialJobs, totalJobs, companyCount }) {
         <RecentlyViewedJobs />
 
         <div ref={listTopRef} className={styles.sectionTop}>
-          <h2 className={styles.sectionTitle}>Latest Job Openings</h2>
+          <h2 className={styles.sectionTitle}>
+            {search 
+              ? `${allFilteredJobs.length} result${allFilteredJobs.length === 1 ? '' : 's'} for "${search}"`
+              : 'Latest Job Openings'
+            }
+          </h2>
           <div className={styles.filters}>
             {CATEGORIES_UI.map((c) => (
               <button
@@ -499,8 +504,6 @@ export default function Home({ initialJobs, totalJobs, companyCount }) {
 
             <div className={styles.pageStatus} aria-live="polite">
               Page {page} of {activeTotalPages} · Showing {currentPageJobs.length} jobs
-              {search && ` · ${allFilteredJobs.length} results for "${search}"`}
-              {!search && filter !== 'All' && ` · ${allFilteredJobs.length} total ${filter}`}
             </div>
           </>
         )}
