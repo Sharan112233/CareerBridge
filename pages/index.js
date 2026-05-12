@@ -1,13 +1,4 @@
 // pages/index.js — Home page (ISR, SERVER-paginated, filter-persistent)
-//
-// FIX: previous version had a re-render loop where `setFetchingPage` triggered
-// the same effect that started the fetch — causing the cleanup function to
-// cancel the in-flight request before its data could land. Symptoms: the
-// loader spun forever and Next/Prev "did nothing".
-//
-// Solution: track in-flight requests with a useRef (refs don't trigger
-// re-renders) instead of state. Added an AbortController + 15s timeout so
-// failed network requests surface as an error toast instead of hanging.
 
 import React from 'react';
 import Head from 'next/head';
@@ -29,7 +20,7 @@ const RecentlyViewedJobs = dynamic(
 );
 
 const PAGE_SIZE = 9;
-const FETCH_TIMEOUT_MS = 15000; // surface a failure after 15s instead of spinning forever
+const FETCH_TIMEOUT_MS = 15000;
 
 export default function Home({ initialJobs, totalJobs, companyCount }) {
   const router = useRouter();
@@ -39,72 +30,115 @@ export default function Home({ initialJobs, totalJobs, companyCount }) {
   const [page, setPage] = React.useState(1);
   const [loadedPages, setLoadedPages] = React.useState({ 1: initialJobs });
   const [filteredCache, setFilteredCache] = React.useState({});
+  const [allJobsCache, setAllJobsCache] = React.useState(null);
+  const [searchResults, setSearchResults] = React.useState(null);
 
-  // Render-only flag: just used to show/hide the spinner.
   const [isLoading, setIsLoading] = React.useState(false);
   const [loadError, setLoadError] = React.useState(null);
 
   const [hydrated, setHydrated] = React.useState(false);
   const listTopRef = React.useRef(null);
 
-  // Track which page is currently being fetched in a REF — refs don't cause
-  // re-renders, so the effect doesn't see itself update.
   const inFlightPageRef = React.useRef(null);
   const inFlightFilterRef = React.useRef(null);
+  const inFlightSearchRef = React.useRef(null);
 
   const totalPages = Math.max(1, Math.ceil(totalJobs / PAGE_SIZE));
 
-  // Hydrate state from URL + localStorage
+  // Reset filter to 'All' when component mounts (homepage visit)
   React.useEffect(() => {
-    if (!router.isReady) return;
-    const { filter: qF, search: qS, page: qP } = router.query;
-
-    let nextFilter = 'All';
-    if (typeof qF === 'string' && CATEGORIES_UI.includes(qF)) {
-      nextFilter = qF;
-    } else {
-      try {
-        const saved = localStorage.getItem('cb_filter');
-        if (saved && CATEGORIES_UI.includes(saved)) nextFilter = saved;
-      } catch {}
-    }
-
-    let nextSearch = '';
-    if (typeof qS === 'string') nextSearch = qS;
-
-    let nextPage = 1;
-    if (typeof qP === 'string') {
-      const p = parseInt(qP, 10);
-      if (Number.isFinite(p) && p > 0) nextPage = p;
-    }
-
-    try { localStorage.removeItem('cb_search'); } catch {}
-
-    setFilter(nextFilter);
-    setSearch(nextSearch);
-    setPage(nextPage);
+    setFilter('All');
+    setSearch('');
+    setPage(1);
+    setSearchResults(null);
+    setFilteredCache({});
     setHydrated(true);
-  }, [router.isReady, router.query]);
+  }, []);
 
+  // Fetch all jobs for search functionality
   React.useEffect(() => {
     if (!hydrated) return;
-    try { localStorage.setItem('cb_filter', filter); } catch {}
-  }, [filter, hydrated]);
+    if (allJobsCache) return; // Already loaded
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort('timeout'), FETCH_TIMEOUT_MS);
+
+    fetch('/api/jobs?pageSize=10000', { signal: controller.signal })
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then((data) => {
+        setAllJobsCache(data.jobs || []);
+      })
+      .catch((err) => {
+        console.error('Failed to load all jobs for search:', err);
+      })
+      .finally(() => {
+        clearTimeout(timer);
+      });
+
+    return () => {
+      clearTimeout(timer);
+      controller.abort('superseded');
+    };
+  }, [hydrated, allJobsCache]);
+
+  // Handle search - search across all jobs
+  React.useEffect(() => {
+    if (!hydrated) return;
+    
+    const q = search.trim().toLowerCase();
+    
+    if (!q) {
+      setSearchResults(null);
+      return;
+    }
+
+    // If we don't have all jobs yet, wait
+    if (!allJobsCache) {
+      setIsLoading(true);
+      return;
+    }
+
+    setIsLoading(true);
+
+    // Search across all jobs
+    setTimeout(() => {
+      const results = allJobsCache.filter((j) => {
+        const matchSearch =
+          (j.title || '').toLowerCase().includes(q) ||
+          (j.company || '').toLowerCase().includes(q) ||
+          (j.location || '').toLowerCase().includes(q) ||
+          (j.tags || []).some((t) => (t || '').toLowerCase().includes(q));
+        
+        // Apply current filter on search results
+        const matchFilter =
+          filter === 'All' ? true :
+          filter === 'IT Jobs' ? j.category === 'IT' :
+          filter === 'BPO Jobs' ? j.category === 'BPO' :
+          filter === 'Fresher' ? Boolean(j.is_fresher) : true;
+        
+        return matchSearch && matchFilter;
+      });
+
+      setSearchResults(results);
+      setPage(1);
+      setIsLoading(false);
+    }, 100);
+  }, [search, allJobsCache, filter, hydrated]);
 
   // Fetch filtered jobs when filter changes
   React.useEffect(() => {
     if (!hydrated) return;
     if (filter === 'All') {
-      // No need to fetch, use regular pagination
       return;
     }
     
-    // Check if we already have this filter cached
     if (filteredCache[filter]) {
       return;
     }
 
-    // Check if already fetching this filter
     if (inFlightFilterRef.current === filter) {
       return;
     }
@@ -118,8 +152,7 @@ export default function Home({ initialJobs, totalJobs, companyCount }) {
 
     let cancelled = false;
 
-    // Fetch all jobs for this filter
-    let apiUrl = '/api/jobs?pageSize=1000'; // Get all jobs
+    let apiUrl = '/api/jobs?pageSize=1000';
     if (filter === 'IT Jobs') {
       apiUrl += '&category=IT';
     } else if (filter === 'BPO Jobs') {
@@ -163,15 +196,14 @@ export default function Home({ initialJobs, totalJobs, companyCount }) {
   // Fetch missing pages on demand for 'All' filter
   React.useEffect(() => {
     if (!hydrated) return;
-    if (filter !== 'All') return; // Only fetch pages when filter is 'All'
+    if (filter !== 'All') return;
+    if (search) return; // Don't fetch pages when searching
     if (loadedPages[page]) {
-      // We already have this page — nothing to do
       setIsLoading(false);
       setLoadError(null);
       return;
     }
     if (inFlightPageRef.current === page) {
-      // Already fetching this exact page — don't fire a duplicate request
       return;
     }
 
@@ -179,8 +211,6 @@ export default function Home({ initialJobs, totalJobs, companyCount }) {
     setIsLoading(true);
     setLoadError(null);
 
-    // Timeout via AbortController — without this, a stalled network request
-    // can hang forever, which is what was causing "loading for 5 minutes".
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort('timeout'), FETCH_TIMEOUT_MS);
 
@@ -214,62 +244,46 @@ export default function Home({ initialJobs, totalJobs, companyCount }) {
     return () => {
       cancelled = true;
       clearTimeout(timer);
-      // Abort the in-flight request when this effect cleans up (e.g. user
-      // navigated to a different page). Don't reset inFlightPageRef here —
-      // .finally() handles that, and we want it to stay set so a duplicate
-      // fetch isn't fired before the abort propagates.
       controller.abort('superseded');
     };
-  }, [page, loadedPages, hydrated, filter]);
+  }, [page, loadedPages, hydrated, filter, search]);
 
-  // Get the current jobs based on filter
+  // Get the current jobs based on filter and search
   const allFilteredJobs = React.useMemo(() => {
-    if (filter === 'All') {
-      return loadedPages[page] || [];
-    } else {
+    // If searching, return search results
+    if (search && searchResults) {
+      return searchResults;
+    }
+
+    // If filter is active, return filtered cache
+    if (filter !== 'All') {
       return filteredCache[filter] || [];
     }
-  }, [filter, loadedPages, page, filteredCache]);
 
-  // Apply search on top of filtered jobs
-  const displayJobs = React.useMemo(() => {
-    const q = search.trim().toLowerCase();
-    if (!q) return allFilteredJobs;
-    
-    return allFilteredJobs.filter((j) => {
-      return (
-        (j.title || '').toLowerCase().includes(q) ||
-        (j.company || '').toLowerCase().includes(q) ||
-        (j.location || '').toLowerCase().includes(q) ||
-        (j.tags || []).some((t) => (t || '').toLowerCase().includes(q))
-      );
-    });
-  }, [allFilteredJobs, search]);
+    // Default: return current page jobs
+    return loadedPages[page] || [];
+  }, [filter, loadedPages, page, filteredCache, search, searchResults]);
 
-  // Paginate filtered jobs
-  const filteredTotalPages = filter !== 'All' 
-    ? Math.ceil(displayJobs.length / PAGE_SIZE)
+  // Paginate the jobs
+  const filteredTotalPages = (search && searchResults) || filter !== 'All'
+    ? Math.ceil(allFilteredJobs.length / PAGE_SIZE)
     : totalPages;
   
-  const currentPageJobs = filter !== 'All'
-    ? displayJobs.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
-    : displayJobs;
+  const currentPageJobs = (search && searchResults) || filter !== 'All'
+    ? allFilteredJobs.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+    : allFilteredJobs;
 
+  // Reset page when filter or search changes
   React.useEffect(() => {
     if (!hydrated) return;
     setPage(1);
-    // Clear filtered cache when search changes
-    if (search) {
-      setFilteredCache({});
-    }
-    // Scroll to job results when user searches
-    if (search && listTopRef.current) {
+    if ((search || filter !== 'All') && listTopRef.current) {
       listTopRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }, [filter, search, hydrated]);
 
   const goToPage = (p) => {
-    const maxPages = filter !== 'All' ? filteredTotalPages : totalPages;
+    const maxPages = (search && searchResults) || filter !== 'All' ? filteredTotalPages : totalPages;
     if (p < 1 || p > maxPages) return;
     setPage(p);
     if (listTopRef.current) {
@@ -278,14 +292,13 @@ export default function Home({ initialJobs, totalJobs, companyCount }) {
   };
 
   const retryCurrentPage = () => {
-    // Clear error and force the effect to re-run
-    if (filter === 'All') {
+    if (filter === 'All' && !search) {
       setLoadedPages((prev) => {
         const copy = { ...prev };
         delete copy[page];
         return copy;
       });
-    } else {
+    } else if (filter !== 'All') {
       setFilteredCache((prev) => {
         const copy = { ...prev };
         delete copy[filter];
@@ -294,7 +307,7 @@ export default function Home({ initialJobs, totalJobs, companyCount }) {
     }
   };
 
-  const activeTotalPages = filter !== 'All' ? filteredTotalPages : totalPages;
+  const activeTotalPages = (search && searchResults) || filter !== 'All' ? filteredTotalPages : totalPages;
 
   return (
     <Layout>
@@ -418,7 +431,7 @@ export default function Home({ initialJobs, totalJobs, companyCount }) {
         </div>
 
         {isLoading ? (
-          <Spinner size="large" label={filter !== 'All' ? `Loading ${filter}...` : `Loading page ${page}…`} />
+          <Spinner size="large" label={search ? 'Searching...' : filter !== 'All' ? `Loading ${filter}...` : `Loading page ${page}…`} />
         ) : loadError ? (
           <div className={styles.empty}>
             <p style={{ marginBottom: 12 }}>{loadError}</p>
@@ -433,8 +446,10 @@ export default function Home({ initialJobs, totalJobs, companyCount }) {
           </div>
         ) : currentPageJobs.length === 0 ? (
           <div className={styles.empty}>
-            {search || filter !== 'All'
-              ? 'No jobs match your filters. Try different criteria.'
+            {search
+              ? `No jobs found for "${search}". Try different keywords.`
+              : filter !== 'All'
+              ? `No ${filter} available right now.`
               : 'No jobs found.'}
           </div>
         ) : (
@@ -484,7 +499,8 @@ export default function Home({ initialJobs, totalJobs, companyCount }) {
 
             <div className={styles.pageStatus} aria-live="polite">
               Page {page} of {activeTotalPages} · Showing {currentPageJobs.length} jobs
-              {filter !== 'All' && ` · ${displayJobs.length} total ${filter}`}
+              {search && ` · ${allFilteredJobs.length} results for "${search}"`}
+              {!search && filter !== 'All' && ` · ${allFilteredJobs.length} total ${filter}`}
             </div>
           </>
         )}
@@ -511,13 +527,6 @@ export default function Home({ initialJobs, totalJobs, companyCount }) {
 
 export async function getStaticProps() {
   try {
-    // We need three things from the DB at build time:
-    //   1. Page 1 jobs (for the listing)
-    //   2. Total active job count (for pagination + hero stat)
-    //   3. Distinct company count (for hero stat)
-    //
-    // Importing getAllCompanies inside the function keeps the bundle tree-shake
-    // clean — getAllCompanies is only used here on the server.
     const { getAllCompanies } = await import('../lib/supabase');
 
     const [{ jobs, total }, companies] = await Promise.all([
