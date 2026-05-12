@@ -17,6 +17,7 @@ export default function CategorySlug({ slug, label, jobs }) {
       canonicalPath={`/category/${slug}`}
       metaDescription={`Find the latest ${label.toLowerCase()} from TCS, Infosys, Wipro, and 50+ companies. ${SITE_NAME} updates listings daily.`}
       jobs={jobs}
+      categoryType={label}
       breadcrumbs={[
         ['Home', '/'],
         ['Categories', null],

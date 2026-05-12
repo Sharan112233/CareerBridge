@@ -10,6 +10,7 @@ import Navbar from './Navbar';
 import JobCard from './JobCard';
 import AdBanner from './AdBanner';
 import Footer from './Footer';
+import Spinner from './Spinner';
 import styles from '../styles/Home.module.css';
 import { SITE_NAME, SITE_URL } from '../lib/constants';
 
@@ -21,13 +22,57 @@ export default function CategoryLandingPage({
   metaDescription,
   jobs,
   breadcrumbs, // array of [label, href|null]
+  categoryType, // e.g. "IT Jobs", "BPO Jobs", "Fresher"
 }) {
   const [page, setPage] = React.useState(1);
+  const [search, setSearch] = React.useState('');
+  const [isChangingPage, setIsChangingPage] = React.useState(false);
   const jobsPerPage = 9;
-  const totalPages = Math.ceil(jobs.length / jobsPerPage);
+  const listTopRef = React.useRef(null);
+
+  // Dynamic placeholder based on category
+  const searchPlaceholder = categoryType 
+    ? `Search ${categoryType.toLowerCase()}...`
+    : 'Search company, role, location...';
+
+  // Filter jobs by search query
+  const filteredJobs = React.useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return jobs;
+    
+    return jobs.filter((j) => {
+      return (
+        (j.title || '').toLowerCase().includes(q) ||
+        (j.company || '').toLowerCase().includes(q) ||
+        (j.location || '').toLowerCase().includes(q) ||
+        (j.tags || []).some((t) => (t || '').toLowerCase().includes(q))
+      );
+    });
+  }, [jobs, search]);
+
+  const totalPages = Math.ceil(filteredJobs.length / jobsPerPage);
   const startIndex = (page - 1) * jobsPerPage;
   const endIndex = startIndex + jobsPerPage;
-  const currentJobs = jobs.slice(startIndex, endIndex);
+  const currentJobs = filteredJobs.slice(startIndex, endIndex);
+
+  // Reset to page 1 when search changes
+  React.useEffect(() => {
+    setPage(1);
+  }, [search]);
+
+  const goToPage = (p) => {
+    if (p < 1 || p > totalPages || p === page) return;
+    setIsChangingPage(true);
+    setPage(p);
+    
+    // Scroll to top
+    if (listTopRef.current) {
+      listTopRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    
+    // Clear loading state after animation
+    setTimeout(() => setIsChangingPage(false), 300);
+  };
 
   return (
     <Layout>
@@ -40,7 +85,7 @@ export default function CategoryLandingPage({
         <link rel="canonical" href={`${SITE_URL}${canonicalPath}`} />
       </Head>
 
-      <Navbar />
+      <Navbar search={search} onSearch={setSearch} searchPlaceholder={searchPlaceholder} />
 
       <section className={styles.hero}>
         <div className={styles.heroInner}>
@@ -147,12 +192,16 @@ export default function CategoryLandingPage({
       </div>
 
       <main className={styles.main}>
-        <div className={styles.sectionTop}>
-          <h2 className={styles.sectionTitle}>{jobs.length} job{jobs.length === 1 ? '' : 's'} found</h2>
+        <div ref={listTopRef} className={styles.sectionTop}>
+          <h2 className={styles.sectionTitle}>{filteredJobs.length} job{filteredJobs.length === 1 ? '' : 's'} found</h2>
         </div>
 
-        {jobs.length === 0 ? (
-          <div className={styles.empty}>No jobs in this category right now. Check back soon!</div>
+        {isChangingPage ? (
+          <Spinner size="large" label={`Loading page ${page}…`} />
+        ) : filteredJobs.length === 0 ? (
+          <div className={styles.empty}>
+            {search ? 'No jobs match your search. Try different keywords.' : 'No jobs in this category right now. Check back soon!'}
+          </div>
         ) : (
           <>
             <div className={styles.grid}>
@@ -173,8 +222,8 @@ export default function CategoryLandingPage({
               <nav className={styles.pagination} aria-label="Pagination">
                 <button
                   className={styles.pageBtn}
-                  onClick={() => setPage(p => Math.max(1, p - 1))}
-                  disabled={page === 1}
+                  onClick={() => goToPage(page - 1)}
+                  disabled={page === 1 || isChangingPage}
                 >
                   ← Prev
                 </button>
@@ -185,7 +234,8 @@ export default function CategoryLandingPage({
                       {i > 0 && arr[i - 1] !== p - 1 && <span style={{ color: 'var(--text-faint)' }}>…</span>}
                       <button
                         className={`${styles.pageBtn} ${p === page ? styles.pageBtnActive : ''}`}
-                        onClick={() => setPage(p)}
+                        onClick={() => goToPage(p)}
+                        disabled={isChangingPage}
                         aria-current={p === page ? 'page' : undefined}
                       >
                         {p}
@@ -194,8 +244,8 @@ export default function CategoryLandingPage({
                   ))}
                 <button
                   className={styles.pageBtn}
-                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                  disabled={page === totalPages}
+                  onClick={() => goToPage(page + 1)}
+                  disabled={page === totalPages || isChangingPage}
                 >
                   Next →
                 </button>
@@ -203,7 +253,9 @@ export default function CategoryLandingPage({
             )}
 
             <div className={styles.pageStatus} aria-live="polite">
-              Page {page} of {totalPages} · Showing {currentJobs.length} jobs
+              {isChangingPage
+                ? `Loading page ${page}…`
+                : `Page ${page} of ${totalPages} · Showing ${currentJobs.length} jobs`}
             </div>
           </>
         )}

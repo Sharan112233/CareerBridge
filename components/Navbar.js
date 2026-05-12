@@ -4,9 +4,11 @@ import Link from 'next/link';
 import styles from '../styles/Navbar.module.css';
 import { useTheme } from '../lib/theme';
 
-export default function Navbar({ search = '', onSearch }) {
+export default function Navbar({ search = '', onSearch, searchPlaceholder }) {
   const [menuOpen, setMenuOpen] = React.useState(false);
   const { theme, toggle, mounted } = useTheme();
+
+  const placeholder = searchPlaceholder || 'Search company, role, location...';
 
   return (
     <nav className={styles.nav}>
@@ -25,7 +27,7 @@ export default function Navbar({ search = '', onSearch }) {
             <input
               className={styles.searchInput}
               type="search"
-              placeholder="Search company, role, location..."
+              placeholder={placeholder}
               value={search}
               onChange={(e) => onSearch(e.target.value)}
               aria-label="Search jobs"

@@ -201,57 +201,41 @@ export default function Home({ initialJobs, totalJobs, companyCount }) {
 
   const retryCurrentPage = () => {
     // Clear error and force the effect to re-run by removing this page from cache
-    setLoadError(null);
     setLoadedPages((prev) => {
-      const next = { ...prev };
-      delete next[page];
-      return next;
+      const copy = { ...prev };
+      delete copy[page];
+      return copy;
     });
-    inFlightPageRef.current = null;
   };
 
   return (
     <Layout>
       <Head>
-        <title>{`${SITE_NAME} – Latest Job Openings 2026 | IT, BPO, Fresher Jobs`}</title>
+        <title>{`${SITE_NAME} – ${SITE_DESCRIPTION}`}</title>
         <meta name="description" content={SITE_DESCRIPTION} />
-        <meta property="og:title" content={`${SITE_NAME} – Latest Job Openings`} />
-        <meta property="og:description" content={SITE_DESCRIPTION} />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content={SITE_URL} />
+        <meta property="og:title" content={`${SITE_NAME} – ${SITE_DESCRIPTION}`} />
+        <meta property="og:description" content={SITE_DESCRIPTION} />
         <link rel="canonical" href={SITE_URL} />
       </Head>
 
       <Navbar search={search} onSearch={setSearch} />
 
-        <section className={styles.hero}>
+      <section className={styles.hero}>
         <div className={styles.heroInner}>
           <div className={styles.heroContent}>
             <h1 className={styles.heroTitle}>
-              Find Your Dream Job
-              <span className={styles.heroAccent}>from Top Companies</span>
+              Find Your Dream Job Today
             </h1>
             <p className={styles.heroSub}>
-              We curate the latest openings from Wipro, Infosys, TCS, Accenture & more.
-              <br />
-              One click → Official Company Application Page.
+              Browse job openings from TCS, Infosys, Wipro, Accenture, and 50+ companies. We update listings every day. Apply directly on the official company website — 100% free, no signup needed.
             </p>
-            <a href="#jobs" className={styles.heroBtn} onClick={(e) => {
-              e.preventDefault();
-              if (listTopRef.current) {
-                listTopRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              }
-            }}>
-              Explore Jobs
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M5 12h14M12 5l7 7-7 7"/>
-              </svg>
-            </a>
             <div className={styles.heroStats}>
               <div className={styles.stat}>
                 <div className={styles.statIcon}>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/>
+                    <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
                   </svg>
                 </div>
                 <div className={styles.statContent}>
@@ -377,45 +361,44 @@ export default function Home({ initialJobs, totalJobs, companyCount }) {
           </>
         )}
 
-        {totalPages > 1 && (
-          <nav className={styles.pagination} aria-label="Pagination">
-            <button
-              className={styles.pageBtn}
-              onClick={() => goToPage(page - 1)}
-              disabled={page === 1 || isLoading}
-            >
-              ← Prev
-            </button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1)
-              .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
-              .map((p, i, arr) => (
-                <React.Fragment key={p}>
-                  {i > 0 && arr[i - 1] !== p - 1 && <span style={{ color: 'var(--text-faint)' }}>…</span>}
-                  <button
-                    className={`${styles.pageBtn} ${p === page ? styles.pageBtnActive : ''}`}
-                    onClick={() => goToPage(p)}
-                    disabled={isLoading}
-                    aria-current={p === page ? 'page' : undefined}
-                  >
-                    {p}
-                  </button>
-                </React.Fragment>
-              ))}
-            <button
-              className={styles.pageBtn}
-              onClick={() => goToPage(page + 1)}
-              disabled={page === totalPages || isLoading}
-            >
-              Next →
-            </button>
-          </nav>
-        )}
+        {!isLoading && totalPages > 1 && (
+          <>
+            <nav className={styles.pagination} aria-label="Pagination">
+              <button
+                className={styles.pageBtn}
+                onClick={() => goToPage(page - 1)}
+                disabled={page === 1}
+              >
+                ← Prev
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1)
+                .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
+                .map((p, i, arr) => (
+                  <React.Fragment key={p}>
+                    {i > 0 && arr[i - 1] !== p - 1 && <span style={{ color: 'var(--text-faint)' }}>…</span>}
+                    <button
+                      className={`${styles.pageBtn} ${p === page ? styles.pageBtnActive : ''}`}
+                      onClick={() => goToPage(p)}
+                      aria-current={p === page ? 'page' : undefined}
+                    >
+                      {p}
+                    </button>
+                  </React.Fragment>
+                ))}
+              <button
+                className={styles.pageBtn}
+                onClick={() => goToPage(page + 1)}
+                disabled={page === totalPages}
+              >
+                Next →
+              </button>
+            </nav>
 
-        <div className={styles.pageStatus} aria-live="polite">
-          {isLoading
-            ? `Loading page ${page}…`
-            : `Page ${page} of ${totalPages} · Showing ${filteredJobs.length} jobs`}
-        </div>
+            <div className={styles.pageStatus} aria-live="polite">
+              Page {page} of {totalPages} · Showing {filteredJobs.length} jobs
+            </div>
+          </>
+        )}
 
         <div className={styles.adBottom}><AdBanner slot="rectangle" /></div>
       </main>

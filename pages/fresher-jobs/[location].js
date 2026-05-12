@@ -23,6 +23,7 @@ export default function FresherJobsLocation({ slug, label, jobs }) {
       canonicalPath={`/fresher-jobs/${slug}`}
       metaDescription={`Find the latest fresher jobs in ${label}. Entry-level openings for graduates from top companies — ${SITE_NAME} updates listings daily.`}
       jobs={jobs}
+      categoryType={`Fresher jobs in ${label}`}
       breadcrumbs={[
         ['Home', '/'],
         ['Fresher Jobs', '/fresher-jobs'],

@@ -14,6 +14,7 @@ export default function FresherJobs({ jobs }) {
       canonicalPath="/fresher-jobs"
       metaDescription={`${SITE_NAME} lists the latest fresher job openings 2026 for B.E/B.Tech/BCA/MCA graduates from top Indian IT, BPO, and banking companies. Apply directly, 100% free.`}
       jobs={jobs}
+      categoryType="Fresher"
       breadcrumbs={[
         ['Home', '/'],
         ['Fresher Jobs', null],

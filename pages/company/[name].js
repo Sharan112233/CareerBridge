@@ -23,6 +23,7 @@ export default function CompanyPage({ company, jobs }) {
       canonicalPath={`/company/${toSlug(company)}`}
       metaDescription={`Latest ${company} job openings curated by ${SITE_NAME}. Apply on the official ${company} careers website — updated daily.`}
       jobs={jobs}
+      categoryType={`${company} jobs`}
       breadcrumbs={[
         ['Home', '/'],
         ['Companies', null],
