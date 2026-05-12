@@ -164,43 +164,96 @@ export default function CategoryLandingPage({
               </div>
             </div>
           </div>
-          <div className={styles.heroIllustration}>
+       <div className={styles.heroIllustration}>
             <svg width="500" height="400" viewBox="0 0 500 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-              {/* Browser Window */}
-              <rect x="50" y="40" width="280" height="200" rx="12" fill="var(--bg-elevated)" stroke="var(--border)" strokeWidth="2"/>
-              <rect x="50" y="40" width="280" height="30" rx="12" fill="var(--bg-muted)"/>
-              <circle cx="68" cy="55" r="4" fill="#DC2626"/>
-              <circle cx="82" cy="55" r="4" fill="#FBBF24"/>
-              <circle cx="96" cy="55" r="4" fill="#16A34A"/>
-              {/* Browser content */}
-              <circle cx="90" cy="100" r="8" fill="var(--text-soft)" opacity="0.3"/>
-              <rect x="110" y="92" width="180" height="8" rx="4" fill="var(--text-soft)" opacity="0.3"/>
-              <rect x="110" y="105" width="120" height="6" rx="3" fill="var(--bg-muted)"/>
-              <circle cx="90" cy="140" r="8" fill="var(--text-soft)" opacity="0.3"/>
-              <rect x="110" y="132" width="180" height="8" rx="4" fill="var(--text-soft)" opacity="0.3"/>
-              <rect x="110" y="145" width="140" height="6" rx="3" fill="var(--bg-muted)"/>
-              <circle cx="90" cy="180" r="8" fill="var(--text-soft)" opacity="0.3"/>
-              <rect x="110" y="172" width="180" height="8" rx="4" fill="var(--text-soft)" opacity="0.3"/>
-              <rect x="110" y="185" width="100" height="6" rx="3" fill="var(--bg-muted)"/>
-              {/* Person sitting */}
-              <ellipse cx="400" cy="360" rx="60" ry="12" fill="var(--text-soft)" opacity="0.2"/>
-              {/* Chair */}
-              <path d="M350 280 L350 360 M370 280 L370 360 M340 360 L380 360 M340 280 L380 280 Q390 260 390 240 L390 200 M340 200 L390 200" stroke="var(--text)" strokeWidth="3" fill="none"/>
-              {/* Person body */}
-              <circle cx="380" cy="160" r="22" fill="#FEE2E2" stroke="var(--text)" strokeWidth="2"/>
-              <path d="M380 182 L380 250" stroke="var(--text)" strokeWidth="3"/>
-              <path d="M380 200 L350 230" stroke="var(--text)" strokeWidth="3"/>
-              <path d="M380 200 L410 220" stroke="var(--text)" strokeWidth="3"/>
-              <path d="M380 250 L360 300" stroke="var(--text)" strokeWidth="3"/>
-              <path d="M380 250 L400 300" stroke="var(--text)" strokeWidth="3"/>
+              {/* Plant pot */}
+              <ellipse cx="100" cy="340" rx="35" ry="12" fill="var(--text-soft)" opacity="0.2"/>
+              <rect x="70" y="300" width="60" height="40" rx="4" fill="#E8F5E9" stroke="var(--border)" strokeWidth="2"/>
+              
+              {/* Plant leaves */}
+              <path d="M85 300 Q80 280 75 260" stroke="#2E7D32" strokeWidth="3" fill="none" strokeLinecap="round"/>
+              <path d="M100 300 Q100 275 100 250" stroke="#2E7D32" strokeWidth="3" fill="none" strokeLinecap="round"/>
+              <path d="M115 300 Q120 280 125 260" stroke="#2E7D32" strokeWidth="3" fill="none" strokeLinecap="round"/>
+              
+              {/* Leaf details */}
+              <ellipse cx="75" cy="260" rx="15" ry="25" fill="#4CAF50" opacity="0.8" transform="rotate(-20 75 260)"/>
+              <ellipse cx="100" cy="250" rx="15" ry="28" fill="#4CAF50" opacity="0.9"/>
+              <ellipse cx="125" cy="260" rx="15" ry="25" fill="#4CAF50" opacity="0.8" transform="rotate(20 125 260)"/>
+              
+              {/* Browser/Screen */}
+              <rect x="180" y="80" width="280" height="200" rx="12" fill="var(--bg-elevated)" stroke="var(--border)" strokeWidth="2"/>
+              <rect x="180" y="80" width="280" height="30" rx="12" fill="var(--bg-muted)"/>
+              
+              {/* Browser buttons */}
+              <circle cx="198" cy="95" r="5" fill="#FF5F56"/>
+              <circle cx="215" cy="95" r="5" fill="#FFBD2E"/>
+              <circle cx="232" cy="95" r="5" fill="#27C93F"/>
+              
+              {/* Search bar in browser */}
+              <rect x="200" y="130" width="240" height="20" rx="10" fill="var(--bg)" stroke="var(--border)" strokeWidth="1"/>
+              <circle cx="215" cy="140" r="6" stroke="var(--text-faint)" strokeWidth="2" fill="none"/>
+              <line x1="220" y1="145" x2="224" y2="149" stroke="var(--text-faint)" strokeWidth="2"/>
+              
+              {/* Content lines in browser */}
+              <rect x="210" y="170" width="40" height="40" rx="6" fill="var(--bg-muted)"/>
+              <rect x="260" y="170" width="160" height="10" rx="5" fill="var(--text-soft)" opacity="0.3"/>
+              <rect x="260" y="190" width="120" height="8" rx="4" fill="var(--text-soft)" opacity="0.2"/>
+              
+              <rect x="210" y="225" width="40" height="40" rx="6" fill="var(--bg-muted)"/>
+              <rect x="260" y="225" width="160" height="10" rx="5" fill="var(--text-soft)" opacity="0.3"/>
+              <rect x="260" y="245" width="140" height="8" rx="4" fill="var(--text-soft)" opacity="0.2"/>
+              
+              {/* Chair base shadow */}
+              <ellipse cx="380" cy="365" rx="60" ry="12" fill="var(--text-soft)" opacity="0.15"/>
+              
+              {/* Modern chair */}
+              {/* Chair legs */}
+              <path d="M340 360 L340 320 M420 360 L420 320" stroke="var(--text)" strokeWidth="3" strokeLinecap="round"/>
+              <path d="M335 360 L425 360" stroke="var(--text)" strokeWidth="3" strokeLinecap="round"/>
+              
+              {/* Chair seat */}
+              <ellipse cx="380" cy="320" rx="50" ry="15" fill="#ECEFF1" stroke="var(--text)" strokeWidth="2"/>
+              
+              {/* Chair back */}
+              <path d="M335 320 Q335 280 345 250 L345 200 Q345 180 360 180 L400 180 Q415 180 415 200 L415 250 Q425 280 425 320" 
+                    fill="#F5F5F5" stroke="var(--text)" strokeWidth="2"/>
+              
+              {/* Person sitting - head */}
+              <circle cx="380" cy="160" r="24" fill="#FFE0B2" stroke="var(--text)" strokeWidth="2"/>
+              
+              {/* Hair */}
+              <path d="M360 145 Q365 135 380 135 Q395 135 400 145 Q402 155 400 165 L360 165 Q358 155 360 145" 
+                    fill="#212121" stroke="var(--text)" strokeWidth="2"/>
+              
+              {/* Face features */}
+              <circle cx="372" cy="160" r="2" fill="var(--text)"/>
+              <circle cx="388" cy="160" r="2" fill="var(--text)"/>
+              <path d="M375 170 Q380 173 385 170" stroke="var(--text)" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+              
+              {/* Shirt/torso */}
+              <path d="M380 184 L380 260" stroke="var(--text)" strokeWidth="3" strokeLinecap="round"/>
+              <path d="M355 190 L380 200 L405 190" stroke="var(--text)" strokeWidth="3" fill="none" strokeLinecap="round"/>
+              
+              {/* Arms */}
+              <path d="M380 200 L350 230 Q345 235 345 240" stroke="var(--text)" strokeWidth="3" strokeLinecap="round"/>
+              <path d="M380 200 L410 230 Q415 235 415 240" stroke="var(--text)" strokeWidth="3" strokeLinecap="round"/>
+              
+              {/* Legs */}
+              <path d="M380 260 L370 310" stroke="var(--text)" strokeWidth="3" strokeLinecap="round"/>
+              <path d="M380 260 L390 310" stroke="var(--text)" strokeWidth="3" strokeLinecap="round"/>
+              
               {/* Laptop */}
-              <rect x="370" y="215" width="60" height="40" rx="2" fill="#1F2937" stroke="var(--text)" strokeWidth="2"/>
-              <rect x="365" y="255" width="70" height="3" fill="#374151"/>
-              {/* Plant */}
-              <ellipse cx="120" cy="300" rx="20" ry="8" fill="var(--text-soft)" opacity="0.3"/>
-              <path d="M120 300 L120 270 M115 280 Q110 275 108 270 M125 280 Q130 275 132 270 M115 285 Q108 282 105 278 M125 285 Q132 282 135 278" stroke="#16A34A" strokeWidth="2" fill="none"/>
+              <rect x="345" y="235" width="70" height="45" rx="3" fill="#37474F" stroke="var(--text)" strokeWidth="2"/>
+              <rect x="350" y="240" width="60" height="35" rx="2" fill="#263238"/>
+              
+              {/* Laptop screen glow */}
+              <rect x="352" y="242" width="56" height="31" rx="1" fill="#4FC3F7" opacity="0.3"/>
+              
+              {/* Laptop base */}
+              <path d="M340 280 L420 280 L425 285 L335 285 Z" fill="#455A64" stroke="var(--text)" strokeWidth="2"/>
             </svg>
           </div>
+            
         </div>
       </section>
 
