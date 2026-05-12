@@ -1,40 +1,58 @@
 // pages/api/jobs.js
-// Public paginated jobs endpoint. Used by the home page to load pages 2+
-// without shipping all jobs in the initial HTML.
-//
-// GET /api/jobs?page=2&pageSize=9
-//   → { jobs: [...], total: 123, page: 2, pageSize: 9 }
+// Paginated job listing API — used by the home page's client-side pagination.
 
-import { getJobsPaginated } from '../../lib/supabase';
-
-const MAX_PAGE_SIZE = 50;
+import { getJobsPaginated, supabase, LISTING_COLUMNS } from '../../lib/supabase';
+import { rateLimit } from '../../lib/rateLimit';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
-    res.setHeader('Allow', 'GET');
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Parse & validate query params
-  const pageNum = parseInt(req.query.page, 10);
-  const sizeNum = parseInt(req.query.pageSize, 10);
-  const page = Number.isFinite(pageNum) && pageNum > 0 ? pageNum : 1;
-  const pageSize = Number.isFinite(sizeNum) && sizeNum > 0 && sizeNum <= MAX_PAGE_SIZE
-    ? sizeNum
-    : 9;
+  try {
+    await rateLimit(req, res);
+  } catch {
+    return res.status(429).json({ error: 'Too many requests' });
+  }
 
   try {
+    const page = parseInt(req.query.page, 10) || 1;
+    const pageSize = parseInt(req.query.pageSize, 10) || 9;
+    const category = req.query.category; // 'IT' or 'BPO'
+    const fresher = req.query.fresher === 'true';
+
+    // If category or fresher filter is specified, fetch filtered jobs
+    if (category || fresher) {
+      let query = supabase
+        .from('jobs')
+        .select(LISTING_COLUMNS, { count: 'exact' })
+        .eq('is_active', true);
+
+      if (category) {
+        query = query.eq('category', category);
+      }
+
+      if (fresher) {
+        query = query.eq('is_fresher', true);
+      }
+
+      query = query.order('created_at', { ascending: false });
+
+      const { data, error, count } = await query;
+
+      if (error) throw error;
+
+      return res.status(200).json({
+        jobs: data || [],
+        total: count || 0,
+      });
+    }
+
+    // Default: paginated all jobs
     const { jobs, total } = await getJobsPaginated(page, pageSize);
-
-    // Cache at the edge for 60s, allow stale for 5 min while revalidating.
-    // On Vercel this hits their CDN, so most requests never touch Supabase.
-    res.setHeader(
-      'Cache-Control',
-      'public, s-maxage=60, stale-while-revalidate=300'
-    );
-
-    return res.status(200).json({ jobs, total, page, pageSize });
-  } catch (e) {
+    return res.status(200).json({ jobs, total });
+  } catch (err) {
+    console.error('API /jobs error:', err);
     return res.status(500).json({ error: 'Failed to fetch jobs' });
   }
 }

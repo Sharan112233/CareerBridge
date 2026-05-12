@@ -38,6 +38,7 @@ export default function Home({ initialJobs, totalJobs, companyCount }) {
   const [search, setSearch] = React.useState('');
   const [page, setPage] = React.useState(1);
   const [loadedPages, setLoadedPages] = React.useState({ 1: initialJobs });
+  const [filteredCache, setFilteredCache] = React.useState({});
 
   // Render-only flag: just used to show/hide the spinner.
   const [isLoading, setIsLoading] = React.useState(false);
@@ -49,6 +50,7 @@ export default function Home({ initialJobs, totalJobs, companyCount }) {
   // Track which page is currently being fetched in a REF — refs don't cause
   // re-renders, so the effect doesn't see itself update.
   const inFlightPageRef = React.useRef(null);
+  const inFlightFilterRef = React.useRef(null);
 
   const totalPages = Math.max(1, Math.ceil(totalJobs / PAGE_SIZE));
 
@@ -89,11 +91,79 @@ export default function Home({ initialJobs, totalJobs, companyCount }) {
     try { localStorage.setItem('cb_filter', filter); } catch {}
   }, [filter, hydrated]);
 
-  // Fetch missing pages on demand.
-  // CRITICAL: this effect's deps DON'T include the in-flight tracker.
-  // It only re-runs when `page` or `loadedPages[page]` changes.
+  // Fetch filtered jobs when filter changes
   React.useEffect(() => {
     if (!hydrated) return;
+    if (filter === 'All') {
+      // No need to fetch, use regular pagination
+      return;
+    }
+    
+    // Check if we already have this filter cached
+    if (filteredCache[filter]) {
+      return;
+    }
+
+    // Check if already fetching this filter
+    if (inFlightFilterRef.current === filter) {
+      return;
+    }
+
+    inFlightFilterRef.current = filter;
+    setIsLoading(true);
+    setLoadError(null);
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort('timeout'), FETCH_TIMEOUT_MS);
+
+    let cancelled = false;
+
+    // Fetch all jobs for this filter
+    let apiUrl = '/api/jobs?pageSize=1000'; // Get all jobs
+    if (filter === 'IT Jobs') {
+      apiUrl += '&category=IT';
+    } else if (filter === 'BPO Jobs') {
+      apiUrl += '&category=BPO';
+    } else if (filter === 'Fresher') {
+      apiUrl += '&fresher=true';
+    }
+
+    fetch(apiUrl, { signal: controller.signal })
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then((data) => {
+        if (cancelled) return;
+        setFilteredCache((prev) => ({ ...prev, [filter]: data.jobs || [] }));
+        setLoadError(null);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        if (err?.name === 'AbortError') {
+          setLoadError('Request timed out. Please check your connection and try again.');
+        } else {
+          setLoadError('Failed to load jobs. Please try again.');
+        }
+      })
+      .finally(() => {
+        if (cancelled) return;
+        clearTimeout(timer);
+        inFlightFilterRef.current = null;
+        setIsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+      controller.abort('superseded');
+    };
+  }, [filter, filteredCache, hydrated]);
+
+  // Fetch missing pages on demand for 'All' filter
+  React.useEffect(() => {
+    if (!hydrated) return;
+    if (filter !== 'All') return; // Only fetch pages when filter is 'All'
     if (loadedPages[page]) {
       // We already have this page — nothing to do
       setIsLoading(false);
@@ -150,41 +220,48 @@ export default function Home({ initialJobs, totalJobs, companyCount }) {
       // fetch isn't fired before the abort propagates.
       controller.abort('superseded');
     };
-  }, [page, loadedPages, hydrated]);
+  }, [page, loadedPages, hydrated, filter]);
 
-  const currentPageJobs = loadedPages[page] || [];
-  
-  // Get all loaded jobs from all pages for search
-  const allLoadedJobs = React.useMemo(() => {
-    return Object.values(loadedPages).flat();
-  }, [loadedPages]);
+  // Get the current jobs based on filter
+  const allFilteredJobs = React.useMemo(() => {
+    if (filter === 'All') {
+      return loadedPages[page] || [];
+    } else {
+      return filteredCache[filter] || [];
+    }
+  }, [filter, loadedPages, page, filteredCache]);
 
-  const filteredJobs = React.useMemo(() => {
+  // Apply search on top of filtered jobs
+  const displayJobs = React.useMemo(() => {
     const q = search.trim().toLowerCase();
-    // When searching, search across ALL loaded jobs
-    const jobsToFilter = q ? allLoadedJobs : currentPageJobs;
+    if (!q) return allFilteredJobs;
     
-    if (!q && filter === 'All') return currentPageJobs;
-    
-    return jobsToFilter.filter((j) => {
-      const matchSearch =
-        !q ||
+    return allFilteredJobs.filter((j) => {
+      return (
         (j.title || '').toLowerCase().includes(q) ||
         (j.company || '').toLowerCase().includes(q) ||
         (j.location || '').toLowerCase().includes(q) ||
-        (j.tags || []).some((t) => (t || '').toLowerCase().includes(q));
-      const matchFilter =
-        filter === 'All'      ? true :
-        filter === 'IT Jobs'  ? j.category === 'IT' :
-        filter === 'BPO Jobs' ? j.category === 'BPO' :
-        filter === 'Fresher'  ? Boolean(j.is_fresher) : true;
-      return matchSearch && matchFilter;
+        (j.tags || []).some((t) => (t || '').toLowerCase().includes(q))
+      );
     });
-  }, [currentPageJobs, allLoadedJobs, search, filter]);
+  }, [allFilteredJobs, search]);
+
+  // Paginate filtered jobs
+  const filteredTotalPages = filter !== 'All' 
+    ? Math.ceil(displayJobs.length / PAGE_SIZE)
+    : totalPages;
+  
+  const currentPageJobs = filter !== 'All'
+    ? displayJobs.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+    : displayJobs;
 
   React.useEffect(() => {
     if (!hydrated) return;
     setPage(1);
+    // Clear filtered cache when search changes
+    if (search) {
+      setFilteredCache({});
+    }
     // Scroll to job results when user searches
     if (search && listTopRef.current) {
       listTopRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -192,7 +269,8 @@ export default function Home({ initialJobs, totalJobs, companyCount }) {
   }, [filter, search, hydrated]);
 
   const goToPage = (p) => {
-    if (p < 1 || p > totalPages) return;
+    const maxPages = filter !== 'All' ? filteredTotalPages : totalPages;
+    if (p < 1 || p > maxPages) return;
     setPage(p);
     if (listTopRef.current) {
       listTopRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -200,13 +278,23 @@ export default function Home({ initialJobs, totalJobs, companyCount }) {
   };
 
   const retryCurrentPage = () => {
-    // Clear error and force the effect to re-run by removing this page from cache
-    setLoadedPages((prev) => {
-      const copy = { ...prev };
-      delete copy[page];
-      return copy;
-    });
+    // Clear error and force the effect to re-run
+    if (filter === 'All') {
+      setLoadedPages((prev) => {
+        const copy = { ...prev };
+        delete copy[page];
+        return copy;
+      });
+    } else {
+      setFilteredCache((prev) => {
+        const copy = { ...prev };
+        delete copy[filter];
+        return copy;
+      });
+    }
   };
+
+  const activeTotalPages = filter !== 'All' ? filteredTotalPages : totalPages;
 
   return (
     <Layout>
@@ -330,7 +418,7 @@ export default function Home({ initialJobs, totalJobs, companyCount }) {
         </div>
 
         {isLoading ? (
-          <Spinner size="large" label={`Loading page ${page}…`} />
+          <Spinner size="large" label={filter !== 'All' ? `Loading ${filter}...` : `Loading page ${page}…`} />
         ) : loadError ? (
           <div className={styles.empty}>
             <p style={{ marginBottom: 12 }}>{loadError}</p>
@@ -343,25 +431,25 @@ export default function Home({ initialJobs, totalJobs, companyCount }) {
               Try again
             </button>
           </div>
-        ) : filteredJobs.length === 0 ? (
+        ) : currentPageJobs.length === 0 ? (
           <div className={styles.empty}>
             {search || filter !== 'All'
-              ? 'No jobs match your filters on this page. Try Prev/Next or clear filters.'
+              ? 'No jobs match your filters. Try different criteria.'
               : 'No jobs found.'}
           </div>
         ) : (
           <>
             <div className={styles.grid}>
-              {filteredJobs.slice(0, 3).map((j) => <JobCard key={j.id} job={j} />)}
+              {currentPageJobs.slice(0, 3).map((j) => <JobCard key={j.id} job={j} />)}
             </div>
             <div className={styles.adMid}><AdBanner slot="large" /></div>
             <div className={styles.grid}>
-              {filteredJobs.slice(3).map((j) => <JobCard key={j.id} job={j} />)}
+              {currentPageJobs.slice(3).map((j) => <JobCard key={j.id} job={j} />)}
             </div>
           </>
         )}
 
-        {!isLoading && totalPages > 1 && (
+        {!isLoading && activeTotalPages > 1 && (
           <>
             <nav className={styles.pagination} aria-label="Pagination">
               <button
@@ -371,8 +459,8 @@ export default function Home({ initialJobs, totalJobs, companyCount }) {
               >
                 ← Prev
               </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1)
-                .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
+              {Array.from({ length: activeTotalPages }, (_, i) => i + 1)
+                .filter((p) => p === 1 || p === activeTotalPages || Math.abs(p - page) <= 1)
                 .map((p, i, arr) => (
                   <React.Fragment key={p}>
                     {i > 0 && arr[i - 1] !== p - 1 && <span style={{ color: 'var(--text-faint)' }}>…</span>}
@@ -388,14 +476,15 @@ export default function Home({ initialJobs, totalJobs, companyCount }) {
               <button
                 className={styles.pageBtn}
                 onClick={() => goToPage(page + 1)}
-                disabled={page === totalPages}
+                disabled={page === activeTotalPages}
               >
                 Next →
               </button>
             </nav>
 
             <div className={styles.pageStatus} aria-live="polite">
-              Page {page} of {totalPages} · Showing {filteredJobs.length} jobs
+              Page {page} of {activeTotalPages} · Showing {currentPageJobs.length} jobs
+              {filter !== 'All' && ` · ${displayJobs.length} total ${filter}`}
             </div>
           </>
         )}
