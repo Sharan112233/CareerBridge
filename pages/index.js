@@ -368,123 +368,43 @@ export default function Home({ initialJobs, totalJobs, companyCount }) {
               </div>
             </div>
           </div>
-       
           <div className={styles.heroIllustration}>
-            <svg width="400" height="280" viewBox="0 0 400 280" fill="none" xmlns="http://www.w3.org/2000/svg">
-              {/* Plant pot - left side */}
-              <ellipse cx="40" cy="250" rx="18" ry="5" fill="#e0e0e0"/>
-              <rect x="24" y="230" width="32" height="20" rx="2" fill="white" stroke="#333" strokeWidth="1.5"/>
-              
-              {/* Plant leaves - 3 leaves */}
-              <path d="M30 230 Q28 220 26 210" stroke="#333" strokeWidth="2" fill="none" strokeLinecap="round"/>
-              <ellipse cx="24" cy="208" rx="6" ry="10" fill="#333" transform="rotate(-15 24 208)"/>
-              
-              <path d="M40 230 Q40 218 40 206" stroke="#333" strokeWidth="2" fill="none" strokeLinecap="round"/>
-              <ellipse cx="40" cy="200" rx="6" ry="12" fill="#333"/>
-              
-              <path d="M50 230 Q52 220 54 210" stroke="#333" strokeWidth="2" fill="none" strokeLinecap="round"/>
-              <ellipse cx="56" cy="208" rx="6" ry="10" fill="#333" transform="rotate(15 56 208)"/>
-              
-              {/* Browser window */}
-              <rect x="70" y="40" width="140" height="120" rx="8" fill="white" stroke="#d0d0d0" strokeWidth="1.5"/>
-              
-              {/* Browser top bar */}
-              <rect x="70" y="40" width="140" height="20" rx="8" fill="#f5f5f5"/>
-              <rect x="70" y="52" width="140" height="8" fill="#f5f5f5"/>
-              
-              {/* Browser dots */}
-              <circle cx="80" cy="50" r="2.5" fill="#d0d0d0"/>
-              <circle cx="90" cy="50" r="2.5" fill="#d0d0d0"/>
-              <circle cx="100" cy="50" r="2.5" fill="#d0d0d0"/>
-              
-              {/* Menu icon - right side */}
-              <line x1="190" y1="48" x2="200" y2="48" stroke="#999" strokeWidth="1.5" strokeLinecap="round"/>
-              <line x1="190" y1="52" x2="200" y2="52" stroke="#999" strokeWidth="1.5" strokeLinecap="round"/>
-              
-              {/* Search bar */}
-              <rect x="80" y="70" width="120" height="16" rx="8" fill="white" stroke="#e0e0e0" strokeWidth="1"/>
-              <circle cx="90" cy="78" r="4" stroke="#999" strokeWidth="1.2" fill="none"/>
-              <line x1="93" y1="81" x2="96" y2="84" stroke="#999" strokeWidth="1.2" strokeLinecap="round"/>
-              
-              {/* Content items */}
-              <rect x="80" y="95" width="20" height="20" rx="3" fill="#f0f0f0"/>
-              <rect x="105" y="98" width="80" height="4" rx="2" fill="#e8e8e8"/>
-              <rect x="105" y="106" width="60" height="3" rx="1.5" fill="#f0f0f0"/>
-              
-              <rect x="80" y="125" width="20" height="20" rx="3" fill="#f0f0f0"/>
-              <rect x="105" y="128" width="80" height="4" rx="2" fill="#e8e8e8"/>
-              <rect x="105" y="136" width="70" height="3" rx="1.5" fill="#f0f0f0"/>
-              
+            <svg width="500" height="400" viewBox="0 0 500 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+              {/* Browser Window */}
+              <rect x="50" y="40" width="280" height="200" rx="12" fill="var(--bg-elevated)" stroke="var(--border)" strokeWidth="2"/>
+              <rect x="50" y="40" width="280" height="30" rx="12" fill="var(--bg-muted)"/>
+              <circle cx="68" cy="55" r="4" fill="#DC2626"/>
+              <circle cx="82" cy="55" r="4" fill="#FBBF24"/>
+              <circle cx="96" cy="55" r="4" fill="#16A34A"/>
+              {/* Browser content */}
+              <circle cx="90" cy="100" r="8" fill="var(--text-soft)" opacity="0.3"/>
+              <rect x="110" y="92" width="180" height="8" rx="4" fill="var(--text-soft)" opacity="0.3"/>
+              <rect x="110" y="105" width="120" height="6" rx="3" fill="var(--bg-muted)"/>
+              <circle cx="90" cy="140" r="8" fill="var(--text-soft)" opacity="0.3"/>
+              <rect x="110" y="132" width="180" height="8" rx="4" fill="var(--text-soft)" opacity="0.3"/>
+              <rect x="110" y="145" width="140" height="6" rx="3" fill="var(--bg-muted)"/>
+              <circle cx="90" cy="180" r="8" fill="var(--text-soft)" opacity="0.3"/>
+              <rect x="110" y="172" width="180" height="8" rx="4" fill="var(--text-soft)" opacity="0.3"/>
+              <rect x="110" y="185" width="100" height="6" rx="3" fill="var(--bg-muted)"/>
               {/* Person sitting */}
-              {/* Head */}
-              <circle cx="300" cy="65" r="16" fill="white" stroke="#333" strokeWidth="1.5"/>
-              
-              {/* Hair */}
-              <path d="M287 60 Q288 52 300 50 Q312 52 313 60 Q314 65 312 70 L288 70 Q286 65 287 60" 
-                    fill="#333" stroke="#333" strokeWidth="1.5"/>
-              
-              {/* Face features */}
-              <circle cx="295" cy="65" r="1.5" fill="#333"/>
-              <circle cx="305" cy="65" r="1.5" fill="#333"/>
-              <path d="M296 72 Q300 74 304 72" stroke="#333" strokeWidth="1" fill="none" strokeLinecap="round"/>
-              
-              {/* Neck and shirt collar */}
-              <path d="M300 81 L300 95" stroke="#333" strokeWidth="1.5"/>
-              <path d="M292 84 Q300 88 308 84" stroke="#333" strokeWidth="1.5" fill="none"/>
-              
-              {/* Shirt/body */}
-              <path d="M285 90 L285 150 Q285 155 290 155 L310 155 Q315 155 315 150 L315 90" 
-                    fill="white" stroke="#333" strokeWidth="1.5"/>
-              
-              {/* Left arm */}
-              <path d="M285 95 Q270 105 265 115 L260 125" stroke="#333" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
-              <path d="M258 123 Q256 128 256 133" stroke="#333" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
-              
-              {/* Right arm */}
-              <path d="M315 95 Q330 105 335 115 L340 125" stroke="#333" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
-              <path d="M342 123 Q344 128 344 133" stroke="#333" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
-              
-              {/* Laptop */}
-              <rect x="270" y="125" width="60" height="35" rx="2" fill="white" stroke="#333" strokeWidth="1.5"/>
-              <rect x="273" y="128" width="54" height="29" rx="1" fill="#f5f5f5"/>
-              
-              {/* Laptop base */}
-              <path d="M265 160 L335 160 L338 163 L262 163 Z" fill="white" stroke="#333" strokeWidth="1.5"/>
-              
-              {/* Laptop screen details */}
-              <circle cx="283" cy="140" r="2" fill="#333"/>
-              <rect x="290" y="137" width="30" height="2" rx="1" fill="#e0e0e0"/>
-              <rect x="290" y="143" width="25" height="2" rx="1" fill="#e0e0e0"/>
-              <rect x="290" y="149" width="28" height="2" rx="1" fill="#e0e0e0"/>
-              
-              {/* Pants/legs */}
-              <path d="M290 155 L285 200 L283 230" stroke="#333" strokeWidth="8" strokeLinecap="round"/>
-              <path d="M310 155 L315 200 L317 230" stroke="#333" strokeWidth="8" strokeLinecap="round"/>
-              
-              {/* Shoes */}
-              <ellipse cx="282" cy="235" rx="10" ry="5" fill="#333"/>
-              <ellipse cx="318" cy="235" rx="10" ry="5" fill="#333"/>
-              <rect x="272" y="230" width="12" height="8" rx="2" fill="#333"/>
-              <rect x="308" y="230" width="12" height="8" rx="2" fill="#333"/>
-              
+              <ellipse cx="400" cy="360" rx="60" ry="12" fill="var(--text-soft)" opacity="0.2"/>
               {/* Chair */}
-              {/* Chair seat */}
-              <ellipse cx="300" cy="165" rx="35" ry="10" fill="white" stroke="#d0d0d0" strokeWidth="1.5"/>
-              
-              {/* Chair back */}
-              <path d="M270 165 Q268 140 272 120 L272 90 Q272 80 280 80 L320 80 Q328 80 328 90 L328 120 Q332 140 330 165" 
-                    fill="white" stroke="#d0d0d0" strokeWidth="1.5"/>
-              
-              {/* Chair legs */}
-              <path d="M275 240 L275 170" stroke="#d0d0d0" strokeWidth="1.5"/>
-              <path d="M325 240 L325 170" stroke="#d0d0d0" strokeWidth="1.5"/>
-              <path d="M270 240 L330 240" stroke="#d0d0d0" strokeWidth="1.5"/>
-              
-              {/* Chair base shadow */}
-              <ellipse cx="300" cy="242" rx="40" ry="6" fill="#f0f0f0" opacity="0.5"/>
+              <path d="M350 280 L350 360 M370 280 L370 360 M340 360 L380 360 M340 280 L380 280 Q390 260 390 240 L390 200 M340 200 L390 200" stroke="var(--text)" strokeWidth="3" fill="none"/>
+              {/* Person body */}
+              <circle cx="380" cy="160" r="22" fill="#FEE2E2" stroke="var(--text)" strokeWidth="2"/>
+              <path d="M380 182 L380 250" stroke="var(--text)" strokeWidth="3"/>
+              <path d="M380 200 L350 230" stroke="var(--text)" strokeWidth="3"/>
+              <path d="M380 200 L410 220" stroke="var(--text)" strokeWidth="3"/>
+              <path d="M380 250 L360 300" stroke="var(--text)" strokeWidth="3"/>
+              <path d="M380 250 L400 300" stroke="var(--text)" strokeWidth="3"/>
+              {/* Laptop */}
+              <rect x="370" y="215" width="60" height="40" rx="2" fill="#1F2937" stroke="var(--text)" strokeWidth="2"/>
+              <rect x="365" y="255" width="70" height="3" fill="#374151"/>
+              {/* Plant */}
+              <ellipse cx="120" cy="300" rx="20" ry="8" fill="var(--text-soft)" opacity="0.3"/>
+              <path d="M120 300 L120 270 M115 280 Q110 275 108 270 M125 280 Q130 275 132 270 M115 285 Q108 282 105 278 M125 285 Q132 282 135 278" stroke="#16A34A" strokeWidth="2" fill="none"/>
             </svg>
           </div>
-
         </div>
       </section>
 
