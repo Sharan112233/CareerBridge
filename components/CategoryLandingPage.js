@@ -27,6 +27,7 @@ export default function CategoryLandingPage({
   const [page, setPage] = React.useState(1);
   const [search, setSearch] = React.useState('');
   const [isChangingPage, setIsChangingPage] = React.useState(false);
+  const [isSearching, setIsSearching] = React.useState(false);
   const jobsPerPage = 9;
   const listTopRef = React.useRef(null);
 
@@ -55,9 +56,25 @@ export default function CategoryLandingPage({
   const endIndex = startIndex + jobsPerPage;
   const currentJobs = filteredJobs.slice(startIndex, endIndex);
 
-  // Reset to page 1 when search changes
+  // Reset to page 1 when search changes with loading state
   React.useEffect(() => {
-    setPage(1);
+    const q = search.trim();
+    if (q) {
+      setIsSearching(true);
+      // Simulate search delay for better UX
+      const timer = setTimeout(() => {
+        setPage(1);
+        setIsSearching(false);
+        // Scroll to results
+        if (listTopRef.current) {
+          listTopRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 300);
+      return () => clearTimeout(timer);
+    } else {
+      setPage(1);
+      setIsSearching(false);
+    }
   }, [search]);
 
   const goToPage = (p) => {
@@ -193,14 +210,19 @@ export default function CategoryLandingPage({
 
       <main className={styles.main}>
         <div ref={listTopRef} className={styles.sectionTop}>
-          <h2 className={styles.sectionTitle}>{filteredJobs.length} job{filteredJobs.length === 1 ? '' : 's'} found</h2>
+          <h2 className={styles.sectionTitle}>
+            {search 
+              ? `${filteredJobs.length} result${filteredJobs.length === 1 ? '' : 's'} for "${search}"`
+              : `${filteredJobs.length} job${filteredJobs.length === 1 ? '' : 's'} found`
+            }
+          </h2>
         </div>
 
-        {isChangingPage ? (
-          <Spinner size="large" label={`Loading page ${page}…`} />
+        {isSearching || isChangingPage ? (
+          <Spinner size="large" label={isSearching ? 'Searching...' : `Loading page ${page}…`} />
         ) : filteredJobs.length === 0 ? (
           <div className={styles.empty}>
-            {search ? 'No jobs match your search. Try different keywords.' : 'No jobs in this category right now. Check back soon!'}
+            {search ? `No jobs found for "${search}". Try different keywords.` : 'No jobs in this category right now. Check back soon!'}
           </div>
         ) : (
           <>
